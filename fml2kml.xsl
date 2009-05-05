@@ -22,43 +22,36 @@
   <xsl:template match="design">
     <Placemark>
       <name><xsl:value-of select="name"/></name>
-      <xsl:if test="position() &gt; 1">
-        <visibility>0</visibility>
-      </xsl:if>
+      <visibility>0</visibility>
       <xsl:for-each select="objects/object">
-        <Model>
-          <altitudeMode>relativeToGround</altitudeMode>
-          <Location>
-            <longitude><xsl:value-of select="points"/></longitude>
-            <latitude><xsl:value-of select="points"/></latitude>
-            <altitude><xsl:value-of select="points"/></altitude>
-          </Location>
-          <Orientation>
-            <heading><xsl:value-of select="rotation"/></heading>
-            <tilt><xsl:value-of select="rotation"/></tilt>
-            <roll><xsl:value-of select="rotation"/></roll>
-          </Orientation>
-          <Scale>
-            <x><xsl:value-of select="size"/></x>
-            <y><xsl:value-of select="size"/></y>
-            <z><xsl:value-of select="size"/></z>
-          </Scale>
-          <xsl:for-each select="asset">
-            <Link>
-              <href>
-                <xsl:variable name="refid" select="@refid"/>
-                <xsl:choose>
-                  <xsl:when test="../../../assets/asset[@id=$refid]/url3d">
-                    <xsl:value-of select="../../../assets/asset[@id=$refid]/url3d"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="../../../assets/asset[@id=$refid]/url2d"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </href>
-            </Link>
-          </xsl:for-each>
-        </Model>
+        <xsl:variable name="refid" select="asset/@refid"/>
+        <xsl:if test="../../assets/asset[@id=$refid]/url3d">
+          <Model>
+            <altitudeMode>relativeToGround</altitudeMode>
+            <Location>
+              <longitude><xsl:value-of select="points"/></longitude>
+              <latitude><xsl:value-of select="points"/></latitude>
+              <altitude><xsl:value-of select="points"/></altitude>
+            </Location>
+            <Orientation>
+              <heading><xsl:value-of select="rotation"/></heading>
+              <tilt><xsl:value-of select="rotation"/></tilt>
+              <roll><xsl:value-of select="rotation"/></roll>
+            </Orientation>
+            <Scale>
+              <x><xsl:value-of select="size"/></x>
+              <y><xsl:value-of select="size"/></y>
+              <z><xsl:value-of select="size"/></z>
+            </Scale>
+            <xsl:for-each select="asset">
+              <Link>
+                <href>
+                  <xsl:value-of select="../../../assets/asset[@id=$refid]/url3d"/>
+                </href>
+              </Link>
+            </xsl:for-each>
+          </Model>
+        </xsl:if>
       </xsl:for-each>
     </Placemark>
   </xsl:template>
