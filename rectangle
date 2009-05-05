@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <created-at type="datetime">2009-03-31T09:18:17-04:00</created-at>
+  <description>zz</description>
+  <element-library-id type="integer">1</element-library-id>
+  <enable-autosave type="boolean">true</enable-autosave>
+  <external-identifier nil="true"></external-identifier>
+  <grid-cell-size type="decimal">2.0</grid-cell-size>
+
+  <grid-sub-cell-size type="decimal">0.5</grid-sub-cell-size>
+  <id type="integer">18464188</id>
+  <name>huy znajet gde dolzhen byt'</name>
+  <original-project-id type="integer" nil="true"></original-project-id>
+  <project-url>qo1u3h</project-url>
+  <public type="boolean">false</public>
+
+  <texture-library-id type="integer">1</texture-library-id>
+  <updated-at type="datetime">2009-04-29T09:56:24-04:00</updated-at>
+  <user-id type="integer">18245385</user-id>
+  <wall-thickness type="decimal">0.2</wall-thickness>
+  <floors type="array">
+    <floor>
+      <id type="integer">18483999</id>
+
+      <name>etazh</name>
+      <level type="integer">0</level>
+      <height type="decimal">2.8</height>
+      <created-at>2009-03-31 09:20:40 -0400</created-at>
+      <updated-at>2009-04-29 09:56:24 -0400</updated-at>
+      <designs type="array">
+
+        <design>
+          <id type="integer">19863799</id>
+          <name>First design</name>
+          <design-type>save</design-type>
+          <thumb-url>http://cdn.floorplanner.com/uploads/designs/19863799/thumb_2d_04292009_0956AM.jpg</thumb-url>
+          <thumb-2d-url>http://cdn.floorplanner.com/uploads/designs/19863799/thumb_2d_04292009_0956AM.jpg</thumb-2d-url>
+
+          <created-at>2009-04-29 09:56:24 -0400</created-at>
+          <updated-at>2009-04-29 09:56:24 -0400</updated-at>
+          <assets type="array">
+          </assets>
+          <objects type="array">
+          </objects>
+          <lines type="array">
+            <line>
+
+              <type>default_wall</type>
+              <points>2.13 2.71 0.00 11.79 2.71 0.00</points>
+              <thickness>0.20</thickness>
+              <height>2.80</height>
+            </line>
+            <line>
+              <type>default_wall</type>
+
+              <points>11.79 2.71 0.00 11.79 7.05 0.00</points>
+              <thickness>0.20</thickness>
+              <height>2.80</height>
+            </line>
+            <line>
+              <type>default_wall</type>
+              <points>11.79 7.05 0.00 2.13 7.05 0.00</points>
+
+              <thickness>0.20</thickness>
+              <height>2.80</height>
+            </line>
+            <line>
+              <type>default_wall</type>
+              <points>2.13 7.05 0.00 2.13 2.71 0.00</points>
+              <thickness>0.20</thickness>
+
+              <height>2.80</height>
+            </line>
+          </lines>
+          <areas type="array">
+            <area>
+              <type>generated_area</type>
+              <layer type="integer">0</layer>
+
+              <name></name>
+              <points>2.23 2.81 0.00 11.69 2.81 0.00,11.69 2.81 0.00 11.69 6.95 0.00,11.69 6.95 0.00 2.23 6.95 0.00,2.23 6.95 0.00 2.23 2.81 0.00</points>
+              <color>#e4dcc5</color>
+            </area>
+          </areas>
+        </design>
+      </designs>
+    </floor>
+
+  </floors>
+</project>
