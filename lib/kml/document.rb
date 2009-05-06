@@ -1,39 +1,39 @@
 module KML
-  class Document < XML::Document
-    XMLNS = "http://www.opengis.net/kml/2.2"
-    def initialize
-      super
-      self.root = XML::Node.new('kml')
-      self.root.namespaces.namespace = XML::Namespace.new(self.root,nil,XMLNS)
+  class Document
+
+    attr_accessor :geo_points
+
+    def initialize(fml)
+      self.geo_points = fml.geo_points
     end
 
-    def <<(node)
-      root << node
-    end
+    def build
+      @xml = Builder::XmlMarkup.new(:indent => 1)
+      @xml.instruct!
 
-    def self.from_fml(fn)
-      doc = nil
-      Dir.mktmpdir do |tmpdir|
-        kml_path = File.join(tmpdir,File.basename(fn,".fml"))+".kml"
-        `xsltproc -o "#{kml_path}" fml2kml.xsl "#{fn}"`
-
-        doc = KML::Document.file(kml_path)
-        transforms = []
-        ObjectSpace.each_object(Class) do |k|
-          next if !k.ancestors.include?(XML::Node) || 
-                  !k.to_s.include?('KML::Entity::') || transforms.include?(k)
-          transforms << k
-        end
-        transforms.each do |k|
-          doc.find('//'+k.to_s.split('::').last).each do |e|
-            begin
-              k.from_fml(e)
-            rescue NoMethodError
+      output = @xml.Placemark do
+        @xml.name 'Some name'
+        @xml.Polygon do
+          @xml.extrude 1
+          @xml.altitudeMode 'relativeToGround'
+          @xml.outerBoundaryIs do
+            @xml.LinearRing do
+              @xml.coordinates points_string
             end
           end
         end
       end
-      doc
+
+      output
     end
+
+    def points_string
+      string = ""
+      self.geo_points.each do |point|
+        string += "#{point.lattitude},#{point.longtitude},#{point.height}\n"
+      end
+      string
+    end
+    
   end
 end

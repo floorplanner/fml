@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 require 'lib/kml'
+require 'lib/fml'
 
-doc = KML::Document.from_fml(ARGV[0])
-puts doc
+fml = FML::Document.from_xml(ARGV[0])
+kml = KML::Document.new(fml)
+
+puts kml.build
