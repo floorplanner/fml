@@ -7,7 +7,7 @@ $LOAD_PATH.push(File.dirname(__FILE__))
 
 require 'kml/document'
 require 'kml/archive'
-require 'kml/entities'
+require 'kml/elements'
 
 module XML
   class Node

@@ -21,7 +21,7 @@ module KML
         transforms = []
         ObjectSpace.each_object(Class) do |k|
           next if !k.ancestors.include?(XML::Node) || 
-                  !k.to_s.include?('KML::Entity::') || transforms.include?(k)
+                  !k.to_s.include?('KML::Element::') || transforms.include?(k)
           transforms << k
         end
         transforms.each do |k|
