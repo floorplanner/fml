@@ -2,6 +2,7 @@ require 'tmpdir'
 require 'rubygems'
 require 'zip/zip'
 require 'xml'
+require 'xslt'
 
 $LOAD_PATH.push(File.dirname(__FILE__))
 
