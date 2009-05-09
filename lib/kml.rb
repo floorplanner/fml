@@ -6,7 +6,7 @@ require 'xslt'
 
 $LOAD_PATH.push(File.dirname(__FILE__))
 
-require 'transformable'
+require 'transform'
 require 'kml/document'
 require 'kml/archive'
 require 'kml/elements'

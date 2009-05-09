@@ -1,6 +1,5 @@
 module KML
   class Document < XML::Document
-    extend Transformable
     XMLNS = "http://www.opengis.net/kml/2.2"
     def initialize
       super
@@ -19,7 +18,7 @@ module KML
       fml_doc = XML::Document.file(fn)
       doc = stylesheet.apply(fml_doc)
 
-      self.transform('KML::Element::') do |t|
+      transform_with('KML::Element::') do |t|
         doc.find('//'+t.to_s.split('::').last).each do |e|
           begin
             t.from_fml(e)

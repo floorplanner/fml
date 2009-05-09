@@ -12,6 +12,9 @@ module KML
 
     class Link < XML::Node
       def self.from_fml(node)
+        # download the objects' .kmz here,
+        # extract and append Model elements,
+        # and recalculate Location
       end
     end
 
