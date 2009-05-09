@@ -9,6 +9,19 @@ module Collada
         thickness = floats.pop
 
         # calculate wall's vertices here
+        half_thickness = thickness/2
+        out_floats = [
+          floats[0]+half_thickness , floats[1]+half_thickness , floats[2]+height ,
+          floats[3]+half_thickness , floats[4]+half_thickness , floats[5]+height ,
+          floats[0]-half_thickness , floats[1]-half_thickness , floats[2]+height ,
+          floats[3]-half_thickness , floats[4]-half_thickness , floats[5]+height ,
+
+          floats[0]+half_thickness , floats[1]+half_thickness , 0 ,
+          floats[3]+half_thickness , floats[4]+half_thickness , 0 ,
+          floats[0]-half_thickness , floats[1]-half_thickness , 0 ,
+          floats[3]-half_thickness , floats[4]-half_thickness , 0
+        ]
+        node.content = out_floats.join(' ')
       end
     end
   end
