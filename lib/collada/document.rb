@@ -46,6 +46,7 @@ module Collada
           end
         end
 
+        design_doc.find('//dae:height|//dae:thickness').each {|n| n.remove!}
         docs[design_id.gsub(/^design_|_scene$/,'')] = design_doc
       end
       docs
