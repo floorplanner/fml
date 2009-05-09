@@ -58,8 +58,10 @@
                   <xsl:attribute name="id"><xsl:value-of select="$wID"/>_pos</xsl:attribute>
                   <float_array count="24">
                     <xsl:attribute name="id"><xsl:value-of select="$wID"/>_pos_a</xsl:attribute>
-                    <xsl:value-of select="points"/>|<xsl:value-of select="thickness"/>|<xsl:value-of select="height"/>
+                    <xsl:value-of select="points"/>
                   </float_array>
+                  <thickness><xsl:value-of select="thickness"/></thickness>
+                  <height><xsl:value-of select="height"/></height>
                   <technique_common>
                     <accessor count="8" offset="0" stride="3">
                       <xsl:attribute name="source">#<xsl:value-of select="$wID"/>_pos_a</xsl:attribute>
