@@ -28,7 +28,7 @@
                   <color>0.000000 0.000000 0.000000 1</color>
                 </ambient>
                 <diffuse>
-                  <color>0.847059 0.847059 0.847059 1</color>
+                  <color>1.000000 1.000000 1.000000 1</color>
                 </diffuse>
                 <transparent>
                   <color>1 1 1 1</color>
@@ -62,6 +62,7 @@
                   </float_array>
                   <thickness><xsl:value-of select="thickness"/></thickness>
                   <height><xsl:value-of select="height"/></height>
+                  <type><xsl:value-of select="type"/></type>
                   <technique_common>
                     <accessor count="8" offset="0" stride="3">
                       <xsl:attribute name="source">#<xsl:value-of select="$wID"/>_pos_a</xsl:attribute>
@@ -135,9 +136,7 @@
           </visual_scene>
         </xsl:for-each>
       </library_visual_scenes>
-      <scene>
-        <instance_visual_scene url="#VisualSceneNode"/>
-      </scene>
+      <scene/>
     </COLLADA>
   </xsl:template>
 </xsl:stylesheet>
