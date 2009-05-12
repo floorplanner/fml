@@ -1,7 +1,3 @@
-require 'tmpdir'
-require 'forwardable'
-require 'net/http'
-
 require 'rubygems'
 require 'zip/zip'
 require 'builder'
@@ -13,5 +9,8 @@ require 'floorplanner/document'
 require 'floorplanner/design'
 require 'collada/document'
 require 'keyhole/archive'
-
-require 'floorplanner/util/number3d'
+require 'geom/number3d'
+require 'geom/vertex3d'
+require 'geom/intersection'
+require 'geom/edge'
+require 'geom/wall'
