@@ -1,10 +1,9 @@
 #!/usr/bin/env ruby
-require 'lib/kml'
-require 'lib/collada'
+require 'lib/floorplanner'
 
 if !ARGV[0]
-  puts "Usage: fml2kml.rb fmlfile designindex > <walls collada>"
+  puts "Usage: ?"
 else
-  dae = Collada::Document.from_fml(ARGV[0])
-  puts dae.values[ARGV[1].to_i || 0]
+  fml = Floorplanner::Document.new(ARGV[0])
+  puts fml.to_dae
 end
