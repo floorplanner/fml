@@ -18,5 +18,10 @@ module Geom
         v.z - w.z
       )
     end
+
+    def self.from_str(str)
+      x,y,z = str.split(' ') if str
+      str.nil? ? Number3D.new : Number3D.new(x.to_f,y.to_f,z.to_f)
+    end
   end
 end

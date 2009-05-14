@@ -13,9 +13,13 @@ module Keyhole
       extract_entries
       Find.find(to_dir) do |path|
         if path =~ /\.dae/
-          return File.new(path)
+          return path
         end
       end
+    end
+
+    def image_files
+      # return images path array
     end
 
     def destroy
