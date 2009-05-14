@@ -14,3 +14,5 @@ require 'geom/vertex3d'
 require 'geom/intersection'
 require 'geom/edge'
 require 'geom/wall'
+
+CONFIG = YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
