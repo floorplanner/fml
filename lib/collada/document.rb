@@ -12,6 +12,8 @@ module Collada
     LIBRARY_GEOMETRIES = 'library_geometries'
     LIBRARY_VISUAL_SCENES = 'library_visual_scenes'
     SCENE = 'scene'
+    VISUAL_SCENE = 'visual_scene'
+    INSTANCE_VISUAL_SCENE = 'instance_visual_scene'
 
     def initialize
       super
@@ -49,13 +51,18 @@ module Collada
         self << XML::Node.new(LIBRARY_MATERIALS)
         self << XML::Node.new(LIBRARY_EFFECTS)
         self << XML::Node.new(LIBRARY_GEOMETRIES)
-        self << XML::Node.new(LIBRARY_VISUAL_SCENES)
+        self << (visual_scenes = XML::Node.new(LIBRARY_VISUAL_SCENES))
+        visual_scenes << (visual_scene = XML::Node.new(VISUAL_SCENE))
+        visual_scene['id'] = 'MainScene'
+        visual_scene['name'] = 'MainScene'
 
-        self << XML::Node.new(SCENE)
+        self << (scene = XML::Node.new(SCENE))
+        scene << (scene_node = XML::Node.new(INSTANCE_VISUAL_SCENE))
+        scene_node['url'] = '#MainScene'
       end
 
       def library_visual_scenes_node
-        find_node(LIBRARY_VISUAL_SCENES)
+        self.find("//#{VISUAL_SCENE}").first
       end
 
       def library_geometries_node
