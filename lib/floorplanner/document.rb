@@ -1,7 +1,7 @@
 module Floorplanner
   class Document
-    ASSETS_QUERY = '/project/floors/floor/designs/design/assets/asset'
-    OBJECTS_QUERY = '/project/floors/floor/designs/design/objects/object'
+    ASSETS_QUERY = '/project/floors/floor[1]/designs/design[1]/assets/asset'
+    OBJECTS_QUERY = '/project/floors/floor[1]/designs/design[1]/objects/object'
 
     def initialize(fn)
       @xml = XML::Document.file(fn)
@@ -11,7 +11,7 @@ module Floorplanner
       document = Collada::Document.new
       
       objects.each do |object|
-        next unless (arch = assets[object.refid])
+        arch = assets[object.refid]
         # move images
         dae_asset = Collada::Asset.new(arch.dae_file)
         document.place(dae_asset,
@@ -36,17 +36,18 @@ module Floorplanner
       end
 
       def objects
-        objects = []
+        objs = []
         @xml.find(OBJECTS_QUERY).each do |object|
           refid = object.find('asset').first.attributes['refid']
+          next unless assets[refid]
           points = object.find('points').first.content
           rotation = object.find('rotation').
             first.content unless object.find('rotation').empty?
           size = object.find('size').first.content
 
-          objects << Object.new(refid, points, rotation, size)
+          objs << Object.new(refid, points, rotation, size)
         end
-        objects
+        objs
       end
     
   end
