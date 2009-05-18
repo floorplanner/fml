@@ -15,6 +15,8 @@ module Collada
     VISUAL_SCENE = 'visual_scene'
     INSTANCE_VISUAL_SCENE = 'instance_visual_scene'
 
+    attr_accessor :assets_libraries
+
     def initialize
       super
       self.root = XML::Node.new(COLLADA)
@@ -22,6 +24,8 @@ module Collada
       self.root.attributes['version'] = VERSION
 
       create_structure
+
+      self.assets_libraries = []
     end
 
     def << (node)
@@ -36,6 +40,7 @@ module Collada
         doc.library_effects.each do |effect|
           library_effects_node << imported(effect)
         end
+        materials_and_effects_added(doc.name)
       end
 
       doc.library_geometries.each do |geometry|
@@ -82,7 +87,11 @@ module Collada
       end
 
       def materials_and_effects_included?(namespace)
-        false
+        assets_libraries.include?(namespace)
+      end
+
+      def materials_and_effects_added(namespace)
+        assets_libraries << namespace
       end
 
       def imported(nodes)
