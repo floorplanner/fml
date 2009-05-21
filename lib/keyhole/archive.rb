@@ -28,7 +28,7 @@ module Keyhole
 
     private
     def download_link
-      "http://#{CONFIG['content_server']}/assets/#{@url}"
+      "http://#{Floorplanner.config['content_server']}/assets/#{@url}"
     end
 
     def to_dir

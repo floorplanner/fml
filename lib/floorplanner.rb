@@ -22,4 +22,8 @@ require 'geom/intersection'
 require 'geom/edge'
 require 'geom/wall'
 
-CONFIG = YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
+module Floorplanner
+  def self.config
+    @@config || = YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
+  end
+end
