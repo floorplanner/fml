@@ -8,9 +8,8 @@ else
     fml = Floorplanner::Document.new(ARGV[0])
     puts fml.to_dae
   else
-    fml = XML::Document.file(ARGV[1])
-    walls = Floorplanner::Design.new(fml)
-    walls.update
-    puts walls.to_dae
+    fml = XML::Document.file(ARGV[2])
+    design = Floorplanner::Design.new(fml,ARGV[1])
+    design.to_dae
   end
 end

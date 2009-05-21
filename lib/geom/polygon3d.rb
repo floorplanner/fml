@@ -1,0 +1,186 @@
+module Geom
+  class Polygon3D
+
+    WINDING_CW   = 0
+    WINDING_CCW  = 1
+
+    AXIS_X       = 1
+    AXIS_Y       = 2
+    AXIS_Z       = 3
+
+    attr_accessor(:vertices,:faces)
+
+    def initialize(vertices=nil)
+      @vertices = vertices || Array.new
+      @faces    = Array.new
+    end
+
+    def update
+      return false if @vertices.length < 3
+      triangles = triangulate
+      unless triangles
+        @vertices.reverse!
+        triangles = triangulate
+        return false unless triangles
+      end
+
+      triangles.each do |t|
+        v0 = @vertices[t[0]]
+        v1 = @vertices[t[1]]
+        v2 = @vertices[t[2]]
+        @faces.push(Triangle3D.new(self,[v2,v1,v0]))
+      end
+      true
+    end
+
+    def area
+      return nil if @vertices.length < 3
+      ar = 0
+      points = @vertices.dup
+      plane  = self.plane
+
+      ax = plane.normal.x > 0 ? plane.normal.x : -plane.normal.x
+      ay = plane.normal.y > 0 ? plane.normal.y : -plane.normal.y
+      az = plane.normal.z > 0 ? plane.normal.z : -plane.normal.z
+
+      coord = AXIS_Z
+
+      if ax > ay
+        if ax > az
+          coord = AXIS_X
+        end
+      elsif ay > az
+        coord = AXIS_Y
+      end
+
+      points.push(points[0].clone,points[1].clone)
+
+      # compute area of the 2D projection
+      points.length.times do |i|
+        next if i.zero?
+        j = (i+1) % points.length
+        k = (i-1) % points.length
+
+        case coord
+        when AXIS_X
+          ar += (points[i].y * (points[j].z - points[k].z))
+        when AXIS_Y
+          ar += (points[i].x * (points[j].z - points[k].z))
+        else
+          ar += (points[i].x * (points[j].y - points[j].y))
+        end
+      end
+              
+      # scale to get area before projection
+      an = Math.sqrt(ax*ax + ay*ay + az*az) # length of normal vector
+      case coord
+      when AXIS_X
+        ar *= (an / (2*ax))
+      when AXIS_Y
+        ar *= (an / (2*ay))
+      when AXIS_Z
+        ar *= (an / (2*az))
+      end
+      2.times {points.pop}
+      ar
+    end
+
+    def plane
+      return nil if @vertices.length < 3
+      Plane3D.three_points(*@vertices[0..2])
+    end
+
+    def point_inside(pt)
+      x = "x"
+      y = "y"
+      w = false
+      n = @vertices.length
+      dominant = dominant_axis
+      dist = self.plane.distance(pt)
+      
+      return false if dist.abs > 0.01
+      case dominant
+      when AXIS_X
+        x = "y"
+        y = "z"
+      when AXIS_Y
+        y = "z"
+      end
+
+      @vertices.each_with_index do |v,i|
+        n_ext = @vertices[(i+1)%n]
+        if (((v.send(y) <= pt.send(y)) && (pt.send(y) < n_ext.send(y))) || ((n_ext.send(y) <= pt.send(y)) && (pt.send(y) < v.send(y)))) &&
+                (pt.send(x) < (n_ext.send(x) - v.send(x)) * (pt.send(y) - v.send(y)) / (n_ext.send(y) - v.send(y)) + v.send(x))
+          w = !w
+        end
+      end
+      w
+    end
+
+    private
+      def triangulate
+        result  = Array.new
+        points  = @vertices.dup
+        num     = points.length
+        count   = num*2
+        indices = Hash.new
+
+        return [ [0,1,2] ] if num == 3
+        points.each_with_index do |p,i|
+          indices[p] = i
+        end
+
+        while num > 2
+          return nil if count > num*2
+          count += 1
+
+          i = 0
+          while i < num 
+            j = (i+num-1) % num
+            k = (i+1) % num
+
+            if is_ear(points,j,i,k)
+              # save triangle
+              result.push([indices[points[j]],indices[points[i]],indices[points[k]]])
+              # remove vertex
+              points.delete_at(i)
+              num = points.length
+              count = 0
+            end
+            i += 1
+          end
+        end
+        result
+      end
+
+      def is_ear(points,u,v,w)
+        tri = Polygon3D.new([points[u],points[v],points[w]])
+        return false if tri.area < 0
+        points.length.times do |i|
+          next if i == u || i == v || i == w
+          return false if tri.point_inside(points[i])
+        end
+        true
+      end
+
+      def dominant_axis
+        plane = self.plane
+        return 0 unless plane
+
+        ax = (plane.normal.x > 0 ? plane.normal.x : -plane.normal.x)
+        ay = (plane.normal.y > 0 ? plane.normal.y : -plane.normal.y)
+        az = (plane.normal.z > 0 ? plane.normal.z : -plane.normal.z)
+
+        axis = AXIS_Z
+        if ax > ay
+          if ax > az
+            axis = AXIS_X
+          end
+        elsif ay > az
+          axis = AXIS_Y
+        end
+        axis
+      end
+
+  end
+end

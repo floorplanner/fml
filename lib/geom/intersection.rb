@@ -9,7 +9,7 @@ module Geom
       @status = status
     end
 
-    def self.lines(a1,a2,b1,b2,infinite=true)
+    def self.line_line(a1,a2,b1,b2,infinite=true)
       result = Intersection.new
 
       x1, y1 = a1.x, a1.y
@@ -20,8 +20,9 @@ module Geom
       d = ((y4-y3)*(x2-x1)-(x4-x3)*(y2-y1))
 
       unless d.zero?
-        ua = ((x4-x3)*(y1-y3)-(y4-y3)*(x1-x3)) / d;
-        ub = ((x2-x1)*(y1-y3)-(y2-y1)*(x1-x3)) / d;d
+        # The lines intersect at a point somewhere
+        ua = ((x4-x3)*(y1-y3)-(y4-y3)*(x1-x3)) / d
+        ub = ((x2-x1)*(y1-y3)-(y2-y1)*(x1-x3)) / d
         
         result.alpha.push(ua,ub)
         if infinite || ((ua > 0 && ua < 1) && (ub > 0 && ub < 1))

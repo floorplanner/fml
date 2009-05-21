@@ -13,8 +13,18 @@ module Geom
       @position == other.position
     end
 
+    def equal?(other,snap)
+      @position.x-snap < other.x && @position.x+snap > other.x &&
+      @position.y-snap < other.y && @position.y+snap > other.y &&
+      @position.z-snap < other.z && @position.z+snap > other.z
+    end
+
     def clone
       Vertex3D.new(x,y,z)
+    end
+
+    def to_s
+      "#<Geom::Vertex3D:#{@position.to_s}>"
     end
   end
 end
