@@ -1,1 +1,2 @@
 content_server: cdn.floorplanner.com
+fml_schema: xml/fml.rng

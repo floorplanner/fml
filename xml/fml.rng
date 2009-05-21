@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns:m="http://www.floorplaner.com" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <element name="project">
+      <interleave>
+        <element name="name"><text/></element>
+        <optional>
+          <element name="description"><text/></element>
+        </optional><optional>
+          <element name="public"><data type="boolean"/></element>
+        </optional><optional>
+          <element name="external-identifier"><ref name="fp.digitLess"/></element>
+        </optional><optional>
+          <element name="id"><data type="integer"/></element>
+        </optional><optional>
+          <element name="created-at"><data type="dateTime"/></element>
+        </optional><optional>
+          <element name="updated-at"><data type="dateTime"/></element>
+        </optional><optional>
+          <element name="element-library-id"><data type="integer"/></element>
+        </optional><optional>
+          <element name="enable-autosave"><data type="boolean"/></element>
+        </optional><optional>
+          <element name="grid-cell-size"><data type="decimal"/></element>
+        </optional><optional>
+          <element name="grid-sub-cell-size"><data type="decimal"/></element>
+        </optional><optional>
+          <element name="project-url"><data type="anyURI"/></element>
+        </optional>
+
+        <oneOrMore>
+          <element name="floor">
+            <interleave>
+              <element name="name"><text/></element>
+              <element name="level"><data type="integer"/></element>
+              <element name="height"><data type="float"/></element>
+              <optional>
+                <element name="id"><data type="integer"/></element>
+              </optional><optional>
+                <element name="created-at"><data type="dateTime"/></element>
+              </optional><optional>
+                <element name="updated-at"><data type="dateTime"/></element>
+              </optional>
+
+              <oneOrMore>
+                <element name="design">
+                  <interleave>
+                    <element name="name"><text/></element>
+                    <optional>
+                      <element name="id"><data type="integer"/></element>
+                    </optional><optional>
+                      <element name="project-id"><data type="integer"/></element>
+                    </optional><optional>
+                      <element name="floor-id"><data type="integer"/></element>
+                    </optional><optional>
+                      <element name="created-at"><data type="dateTime"/></element>
+                    </optional><optional>
+                      <element name="updated-at"><data type="dateTime"/></element>
+                    </optional><optional>
+                      <element name="thumb-url"><data type="anyURI"/></element>
+                    </optional><optional>
+                      <element name="design-type">
+                        <choice>
+                          <value>save</value>
+                          <value>save_as</value>
+                          <value>save_and_mail</value>
+                        </choice>
+                      </element>
+                    </optional>
+
+                    <zeroOrMore>
+                      <element name="asset">
+                        <interleave>
+                          <attribute name="id"><ref name="fp.digitLess"/></attribute>
+                          <element name="url2d"><data type="anyURI"/></element>
+                          <choice>
+                            <!-- Object assets -->
+                            <group>
+                              <interleave>
+                                <element name="name"><text/></element>
+                                <element name="url3d"><data type="anyURI"/></element>
+                                <element name="layer"><data type="integer"/></element>
+                                <optional>
+                                  <element name="filter-value"><text/></element>
+                                </optional>
+                              </interleave>
+                            </group>
+                            <!-- Texture assets -->
+                            <group>
+                              <interleave>
+                                <element name="name"><text/></element>
+                                <element name="color"><ref name="fp.color"/></element>
+                              </interleave>
+                            </group>
+                            <!-- Line assets -->
+                            <group>
+                              <interleave>
+                                <element name="type"><text/></element>
+                                <element name="color"><ref name="fp.color"/></element>
+                                <element name="thickness"><data type="float"/></element>
+                              </interleave>
+                            </group>
+                          </choice>
+                        </interleave>
+                      </element>
+                    </zeroOrMore>
+
+                    <zeroOrMore>
+                      <element name="object">
+                        <choice>
+                          <!-- Furniture elements -->
+                          <group>
+                            <interleave>
+                              <element name="asset">
+                                <attribute name="refid"><ref name="fp.digitLess"/></attribute>
+                              </element>
+                              <element name="type">
+                                <choice>
+                                  <value>furniture</value>
+                                  <value>text</value>
+                                  <value>opening</value>
+                                </choice>
+                              </element>
+                              <element name="points"><ref name="fp.threeFloats"/></element>
+                              <element name="size"><ref name="fp.threeFloats"/></element>
+                              <optional>
+                                <element name="color"><ref name="fp.color"/></element>
+                              </optional><optional>
+                                <element name="rotation"><ref name="fp.color"/></element>
+                              </optional><optional>
+                                <element name="mirrored"><ref name="fp.threeBools"/></element>
+                              </optional><optional>
+                                <element name="locked"><data type="boolean"/></element>
+                              </optional>
+                            </interleave>
+                          </group>
+                          <!-- Text labels -->
+                          <group>
+                            <interleave>
+                              <element name="text"><text/></element>
+                              <element name="font-family"><text/></element>
+                              <element name="font-size"><data type="integer"/></element>
+                              <element name="font-color"><ref name="fp.color"/></element>
+                              <element name="background-color"><ref name="fp.color"/></element>
+                              <element name="background-alpha"><data type="integer"/></element>
+                              <optional>
+                                <element name="font-bold"><data type="boolean"/></element>
+                              </optional><optional>
+                                <element name="font-italic"><data type="boolean"/></element>
+                              </optional><optional>
+                                <element name="font-underline"><data type="boolean"/></element>
+                              </optional><optional>
+                                <element name="font-outline"><data type="boolean"/></element>
+                              </optional>
+                            </interleave>
+                          </group>
+                        </choice>
+                      </element>
+                    </zeroOrMore>
+
+                    <zeroOrMore>
+                      <element name="line">
+                        <interleave>
+                          <element name="type"><text/></element>
+                          <element name="points"><ref name="fp.sixOrNineFloats"/></element>
+                          <optional>
+                            <element name="asset">
+                              <attribute name="refid"><ref name="fp.digitLess"/></attribute>
+                            </element>
+                          </optional>
+                          <optional>
+                            <element name="color"><ref name="fp.color"/></element>
+                          </optional><optional>
+                            <element name="thickness"><data type="float"/></element>
+                          </optional><optional>
+                            <element name="height"><data type="float"/></element>
+                          </optional><optional>
+                            <element name="custom-text"><text/></element>
+                          </optional>
+                        </interleave>
+                      </element>
+                    </zeroOrMore>
+
+                    <zeroOrMore>
+                      <element name="area">
+                        <oneOrMore>
+                          <element name="line">
+                            <interleave>
+                              <element name="type">
+                                <choice>
+                                  <value>generated_area</value>
+                                  <value>custom_area</value>
+                                </choice>
+                              </element>
+                              <element name="points">
+                                <data type="string">
+                                  <!-- broke regexp implementation, pattern works Ruby's regexp ->
+                                  <param name="pattern">
+                                    ^((\s*[-+]?[0-9]*\.?[0-9]+\s+){5,8}\s*[-+]?[0-9]*\.?[0-9]+\s*?(?:,)?)*$
+                                  </param>
+                                  <- -->
+                                </data>
+                              </element>
+                              <element name="color"><ref name="fp.color"/></element>
+                              <optional>
+                                <element name="asset">
+                                  <attribute name="refid"><ref name="fp.digitLess"/></attribute>
+                                </element>
+                              </optional><optional>
+                                <element name="rotation"><ref name="fp.threeFloats"/></element>
+                              </optional>
+                            </interleave>
+                          </element>
+                        </oneOrMore>
+                      </element>
+                    </zeroOrMore>
+                  </interleave>
+                </element>
+              </oneOrMore>
+            </interleave>
+          </element>
+        </oneOrMore>
+      </interleave>
+    </element>
+  </start>
+
+  <define name="fp.color">
+    <data type="string">
+      <param name="pattern">#([a-fA-F\d]{3}|[a-fA-F\d]{6})</param>
+    </data>
+  </define>
+
+  <define name="fp.threeFloats">
+    <list>
+      <data type="float"/>
+      <data type="float"/>
+      <data type="float"/>
+    </list>
+  </define>
+
+  <define name="fp.threeBools">
+    <list>
+      <data type="boolean"/>
+      <data type="boolean"/>
+      <data type="boolean"/>
+    </list>
+  </define>
+
+  <define name="fp.digitLess">
+    <data type="string">
+      <param name="pattern">[a-zA-Z].*</param>
+    </data>
+  </define>
+  <define name="fp.sixOrNineFloats">
+    <choice>
+      <list>
+        <data type="float"/><data type="float"/>
+        <data type="float"/><data type="float"/>
+        <data type="float"/><data type="float"/>
+      </list>
+      <list>
+        <data type="float"/><data type="float"/><data type="float"/>
+        <data type="float"/><data type="float"/><data type="float"/>
+        <data type="float"/><data type="float"/><data type="float"/>
+      </list>
+    </choice>
+  </define>
+</grammar>

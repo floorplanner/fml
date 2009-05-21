@@ -24,6 +24,6 @@ require 'geom/wall'
 
 module Floorplanner
   def self.config
-    @@config || = YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
+    @@config ||= YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
   end
 end
