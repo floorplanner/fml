@@ -22,8 +22,10 @@ module Floorplanner
     def wall(sp,ep,thickness,height)
       @connections[sp] = Array.new unless @connections.include?(sp)
       @connections[ep] = Array.new unless @connections.include?(ep)
-      @connections[sp] << {:point => ep, :angle => 0.0}
-      @connections[ep] << {:point => sp, :angle => 0.0}
+      cs = Geom::Connection.new(ep, 0.0)
+      ce = Geom::Connection.new(sp, 0.0)
+      @connections[sp] << cs unless @connections[sp].include?(cs)
+      @connections[ep] << ce unless @connections[ep].include?(ce)
       @walls << Geom::Wall.new(Geom::Edge.new(sp,ep), thickness, height, "wall_#{@walls.length}")
     end
 
@@ -89,14 +91,15 @@ module Floorplanner
       !
 
       @walls.each do |w|
-        w.outline.faces.each do |f|
+        color = [rand(155),rand(155),rand(155)]
+        w.outline.faces.each_with_index do |f,i|
           puts %!
-          <polygon points="
+          <polygon id="#{w.name}_#{i}" points="
             #{f.vertices[0].x},#{f.vertices[0].y}
             #{f.vertices[1].x},#{f.vertices[1].y}
             #{f.vertices[2].x},#{f.vertices[2].y}
           "
-style="stroke:rgb(150,99,99);fill:rgb(#{(rand*200).floor},#{(rand*200).floor},#{(rand*200.floor)});stroke-width:0.01;opacity:0.5"/>
+style="stroke:rgb(0,0,0);fill:rgb(#{color.join(',')});stroke-width:0.01;opacity:0.5"/>
         !
         end
       end
@@ -131,19 +134,19 @@ style="stroke:rgb(150,99,99);fill:rgb(#{(rand*200).floor},#{(rand*200).floor},#{
           next if connections.length.zero?
 
           connections.each do |c|
-            x = c[:point].x - v.x
-            y = c[:point].y - v.y
-            c[:angle] = Math.atan2(y,x);
+            x = c.point.x - v.x
+            y = c.point.y - v.y
+            c.angle = Math.atan2(y,x)
           end
-          connections.sort! {|a,b| a[:angle] <=> b[:angle]}
+          connections.sort! {|a,b| a.angle <=> b.angle}
           connections.each_index do |i|
             j = (i+1) % connections.length
 
-            w0 , w1 = find_wall(v,connections[i][:point]),
-                      find_wall(v,connections[j][:point])
+            w0 , w1 = find_wall(v,connections[i].point),
+                      find_wall(v,connections[j].point)
 
-            flipped0 , flipped1 = (w0.baseline.end_point === v),
-                                  (w1.baseline.end_point === v)
+            flipped0 , flipped1 = (w0.baseline.end_point == v),
+                                  (w1.baseline.end_point == v)
 
             e0 , e1 = flipped0 ? w0.outer : w0.inner,
                       flipped1 ? w1.inner : w1.outer

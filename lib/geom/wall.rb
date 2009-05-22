@@ -14,7 +14,7 @@ module Geom
 
     def update(num_start_connections,num_end_connections)
       @outline = Polygon3D.new
-      if num_start_connections == 1
+      if num_start_connections == 2
         @outline.vertices.push(
           @outer.start_point.clone,
           @inner.start_point.clone)
@@ -25,7 +25,7 @@ module Geom
           @inner.start_point.clone)
       end
 
-      if num_end_connections == 1
+      if num_end_connections == 2
         @outline.vertices.push(
           @inner.end_point.clone,
           @outer.end_point.clone)

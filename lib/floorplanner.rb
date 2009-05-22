@@ -19,6 +19,7 @@ require 'geom/triangle3d'
 require 'geom/plane3d'
 require 'geom/matrix3d'
 require 'geom/intersection'
+require 'geom/connection'
 require 'geom/edge'
 require 'geom/wall'
 

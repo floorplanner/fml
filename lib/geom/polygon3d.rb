@@ -35,6 +35,12 @@ module Geom
 
     def area
       return nil if @vertices.length < 3
+      # ?
+      if @vertices.length == 3 
+        @vertices.each do |v|
+          return 0 if @vertices.grep(v).length > 1
+        end
+      end
       result = 0
       points = @vertices.dup
       plane  = self.plane
@@ -155,7 +161,7 @@ module Geom
 
       def is_ear(points,u,v,w)
         poly = Polygon3D.new([points[u],points[v],points[w]])
-        # return false if poly.area < 0
+        return false if poly.area <= 0
         points.length.times do |i|
           next if i == u || i == v || i == w
           return false if poly.point_inside(points[i])
