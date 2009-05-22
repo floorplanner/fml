@@ -27,13 +27,13 @@ module Geom
 
       if num_end_connections == 1
         @outline.vertices.push(
-          @outer.end_point.clone,
-          @inner.end_point.clone)
+          @inner.end_point.clone,
+          @outer.end_point.clone)
       else
         @outline.vertices.push(
-          @outer.end_point.clone,
+          @inner.end_point.clone,
           @baseline.end_point.clone,
-          @inner.end_point.clone)
+          @outer.end_point.clone)
       end
       @outline.vertices.reverse!
 

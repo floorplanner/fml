@@ -35,7 +35,7 @@ module Geom
 
     def area
       return nil if @vertices.length < 3
-      ar = 0
+      result = 0
       points = @vertices.dup
       plane  = self.plane
 
@@ -56,33 +56,33 @@ module Geom
       points.push(points[0].clone,points[1].clone)
 
       # compute area of the 2D projection
-      points.length.times do |i|
+      points.each_with_index do |point,i|
         next if i.zero?
         j = (i+1) % points.length
         k = (i-1) % points.length
 
         case coord
         when AXIS_X
-          ar += (points[i].y * (points[j].z - points[k].z))
+          result += (point.y * (points[j].z - points[k].z))
         when AXIS_Y
-          ar += (points[i].x * (points[j].z - points[k].z))
+          result += (point.x * (points[j].z - points[k].z))
         else
-          ar += (points[i].x * (points[j].y - points[j].y))
+          result += (point.x * (points[j].y - points[k].y))
         end
       end
               
       # scale to get area before projection
-      an = Math.sqrt(ax*ax + ay*ay + az*az) # length of normal vector
+      an = Math.sqrt(ax**2 + ay**2 + az**2) # length of normal vector
       case coord
       when AXIS_X
-        ar *= (an / (2*ax))
+        result *= (an / (2*ax))
       when AXIS_Y
-        ar *= (an / (2*ay))
+        result *= (an / (2*ay))
       when AXIS_Z
-        ar *= (an / (2*az))
+        result *= (an / (2*az))
       end
       2.times {points.pop}
-      ar
+      result
     end
 
     def plane
@@ -93,10 +93,10 @@ module Geom
     def point_inside(pt)
       x = "x"
       y = "y"
-      w = false
       n = @vertices.length
       dominant = dominant_axis
       dist = self.plane.distance(pt)
+      result = false
       
       return false if dist.abs > 0.01
       case dominant
@@ -108,13 +108,13 @@ module Geom
       end
 
       @vertices.each_with_index do |v,i|
-        n_ext = @vertices[(i+1)%n]
-        if (((v.send(y) <= pt.send(y)) && (pt.send(y) < n_ext.send(y))) || ((n_ext.send(y) <= pt.send(y)) && (pt.send(y) < v.send(y)))) &&
-                (pt.send(x) < (n_ext.send(x) - v.send(x)) * (pt.send(y) - v.send(y)) / (n_ext.send(y) - v.send(y)) + v.send(x))
-          w = !w
+        vn = @vertices[(i+1)%n] # next
+        if (((v.send(y) <= pt.send(y)) && (pt.send(y) < vn.send(y))) || ((vn.send(y) <= pt.send(y)) && (pt.send(y) < v.send(y)))) &&
+                (pt.send(x) < (vn.send(x) - v.send(x)) * (pt.send(y) - v.send(y)) / (vn.send(y) - v.send(y)) + v.send(x))
+          result = !result
         end
       end
-      w
+      result
     end
 
     private
@@ -131,7 +131,7 @@ module Geom
         end
 
         while num > 2
-          return nil if count > num*2
+          return nil if count > num*2 # overflow
           count += 1
 
           i = 0
@@ -154,11 +154,11 @@ module Geom
       end
 
       def is_ear(points,u,v,w)
-        tri = Polygon3D.new([points[u],points[v],points[w]])
-        return false if tri.area < 0
+        poly = Polygon3D.new([points[u],points[v],points[w]])
+        # return false if poly.area < 0
         points.length.times do |i|
           next if i == u || i == v || i == w
-          return false if tri.point_inside(points[i])
+          return false if poly.point_inside(points[i])
         end
         true
       end

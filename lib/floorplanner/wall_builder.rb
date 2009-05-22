@@ -91,16 +91,12 @@ module Floorplanner
       @walls.each do |w|
         w.outline.faces.each do |f|
           puts %!
-<line x1="#{f.vertices[0].x}" y1="#{f.vertices[0].y}" x2="#{f.vertices[1].x}" y2="#{f.vertices[1].y}"
-style="stroke:rgb(150,99,99);stroke-width:0.02" id="#{w.name}_outer"/>
-        !
-          puts %!
-<line x1="#{f.vertices[1].x}" y1="#{f.vertices[1].y}" x2="#{f.vertices[2].x}" y2="#{f.vertices[2].y}"
-style="stroke:rgb(150,99,99);stroke-width:0.02" id="#{w.name}_outer"/>
-        !
-          puts %!
-<line x1="#{f.vertices[2].x}" y1="#{f.vertices[2].y}" x2="#{f.vertices[0].x}" y2="#{f.vertices[0].y}"
-style="stroke:rgb(150,99,99);stroke-width:0.02" id="#{w.name}_outer"/>
+          <polygon points="
+            #{f.vertices[0].x},#{f.vertices[0].y}
+            #{f.vertices[1].x},#{f.vertices[1].y}
+            #{f.vertices[2].x},#{f.vertices[2].y}
+          "
+style="stroke:rgb(150,99,99);fill:rgb(#{(rand*200).floor},#{(rand*200).floor},#{(rand*200.floor)});stroke-width:0.01;opacity:0.5"/>
         !
         end
       end
