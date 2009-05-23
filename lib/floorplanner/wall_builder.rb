@@ -35,7 +35,7 @@ module Floorplanner
       template.result(binding)
     end
 
-    def to_svg
+    def to_svg(envelope=false)
       template = ERB.new(File.read('views/outline.svg.erb'))
       template.result(binding)
     end
@@ -119,6 +119,7 @@ module Floorplanner
 
           @vertices.concat(wall.vertices)
           @faces.concat(wall.faces)
+          @polys.concat(wall.polys)
         end
         # remove same instances
         @vertices.uniq!

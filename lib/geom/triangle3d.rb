@@ -1,7 +1,7 @@
 module Geom
   class Triangle3D
     attr_accessor(:vertices,:face_normal)
-    def initialize(poly,vertices)
+    def initialize(vertices)
       unless vertices.length == 3
         raise "Triangle must consist of exactly 3 vertices"
       end

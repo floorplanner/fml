@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone="no"?>
+<% if envelope %><?xml version="1.0" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -58,7 +58,9 @@
      inkscape:document-units="mm" />
      inkscape:current-layer="svg2" />
 
-<% @vertices.each do |v| %>
+<% end %>
+
+<% @walls.vertices.each do |v| %>
 
   <path
      sodipodi:type="arc"
@@ -72,10 +74,14 @@
 
 <% end %>
 
-<% @faces.each do |face| %>
+<% @walls.polys.each do |poly| %>
+  
+  <% poly.faces.each do |face| %>
 
-  <polygon points="<%= face.vertices.collect{|v| [v.x*1000,v.y*1000].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:8.0;fill:rgb(200,200,200);opacity:0.3" />
+    <polygon points="<%= face.vertices.collect{|v| [v.x*1000,v.y*1000].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:8.0;fill:<%= poly.color %>;opacity:0.3" />
+
+  <% end %>
 
 <% end %>
 
-</svg>
+<% if envelope %> </svg> <% end %>

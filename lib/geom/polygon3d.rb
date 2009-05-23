@@ -23,7 +23,7 @@ module Geom
         v0 = @vertices[t[0]]
         v1 = @vertices[t[1]]
         v2 = @vertices[t[2]]
-        @faces.push(Triangle3D.new(self,[v2,v1,v0]))
+        @faces.push(Triangle3D.new([v2,v1,v0]))
       end
       true
     end
@@ -122,7 +122,7 @@ module Geom
     def clone
       vertices = @vertices.collect{|v| v.clone}
       faces    = @faces.collect do |f|
-        Triangle3D.new(nil,[
+        Triangle3D.new([
           vertices[ @vertices.index(f.vertices[0]) ],
           vertices[ @vertices.index(f.vertices[1]) ],
           vertices[ @vertices.index(f.vertices[2]) ]
@@ -142,8 +142,8 @@ module Geom
         j = (i+1) % num
         side.vertices.push(@vertices[i],top_cap.vertices[j],top_cap.vertices[i])
         side.vertices.push(@vertices[i],@vertices[j],top_cap.vertices[j])
-        side.faces.push(Triangle3D.new(nil,side.vertices[0..2]))
-        side.faces.push(Triangle3D.new(nil,side.vertices[3..5]))
+        side.faces.push(Triangle3D.new(side.vertices[0..2]))
+        side.faces.push(Triangle3D.new(side.vertices[3..5]))
       end
 
       sides+[top_cap]

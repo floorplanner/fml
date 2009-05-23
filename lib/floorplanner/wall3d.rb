@@ -38,9 +38,11 @@ module Floorplanner
           @outer.end_point)
       end
       @outline.vertices.reverse!
+      @outline.color = "#ff9999"
 
       if @outline.update
         @extrusion = @outline.extrude(@height)
+        @polys.push(@outline,*@extrusion)
       end
     end
 
