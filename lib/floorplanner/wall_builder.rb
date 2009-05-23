@@ -120,7 +120,14 @@ module Floorplanner
           @vertices.concat(wall.vertices)
           @faces.concat(wall.faces)
         end
+        # remove same instances
         @vertices.uniq!
+        # remove same vertexes
+        old = @vertices.dup
+        @vertices = Array.new
+        old.each do |v|
+          @vertices.push(v) unless @vertices.include?(v)
+        end
       end
 
   end

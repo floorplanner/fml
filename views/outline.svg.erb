@@ -57,9 +57,24 @@
      inkscape:window-y="20"
      inkscape:current-layer="svg2" />
 
-<% @faces.each do |face| %>
+<% @vertices.each do |v| %>
 
-  <polygon points="<%= face.vertices.collect{|v| [v.x,v.y].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:0.01;fill:none" />
+  <path
+     sodipodi:type="arc"
+     style="opacity:1;fill:#0c5c09;fill-opacity:1;stroke:#0000ff;stroke-width:0.01;stroke-miterlimit:4;stroke-dasharray:none"
+     id="path4931"
+     sodipodi:cx="<%= v.x %>"
+     sodipodi:cy="<%= v.y %>"
+     sodipodi:rx="0.019334951"
+     sodipodi:ry="0.019334951"
+     d="M 6.1816599,6.5319185 A 0.019334951,0.019334951 0 1 1 6.14299,6.5319185 A 0.019334951,0.019334951 0 1 1 6.1816599,6.5319185 z" />
 
 <% end %>
+
+<% @faces.each do |face| %>
+
+  <polygon points="<%= face.vertices.collect{|v| [v.x,v.y].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:0.01;fill:rgb(200,200,200);opacity:0.3" />
+
+<% end %>
+
 </svg>
