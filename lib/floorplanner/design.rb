@@ -20,7 +20,11 @@ module Floorplanner
     end
 
     def to_dae
-      @walls.getverts
+      @walls.to_dae
+    end
+
+    def to_svg
+      @walls.to_svg
     end
   end
 end

@@ -1,5 +1,5 @@
-module Geom
-  class Wall
+module Floorplanner
+  class Wall3D < Geom::TriangleMesh3D
     attr_accessor(:baseline,:outline,:inner,:outer,:name)
     def initialize(baseline,thickness,height,name)
       @baseline = baseline
@@ -13,7 +13,7 @@ module Geom
     end
 
     def update(num_start_connections,num_end_connections)
-      @outline = Polygon3D.new
+      @outline = Geom::Polygon3D.new
       if num_start_connections == 2
         @outline.vertices.push(
           @outer.start_point.clone,

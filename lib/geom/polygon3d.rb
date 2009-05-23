@@ -1,5 +1,5 @@
 module Geom
-  class Polygon3D
+  class Polygon3D < TriangleMesh3D
 
     WINDING_CW   = 0
     WINDING_CCW  = 1
@@ -9,11 +9,6 @@ module Geom
     AXIS_Z       = 3
 
     attr_accessor(:vertices,:faces)
-
-    def initialize(vertices=nil)
-      @vertices = vertices || Array.new
-      @faces    = Array.new
-    end
 
     def update
       return false if @vertices.length < 3

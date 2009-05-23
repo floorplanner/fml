@@ -10,6 +10,6 @@ else
   else
     fml = XML::Document.file(ARGV[2])
     design = Floorplanner::Design.new(fml,ARGV[1])
-    design.to_dae
+    puts design.to_svg
   end
 end

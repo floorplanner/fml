@@ -26,85 +26,13 @@ module Floorplanner
       ce = Geom::Connection.new(sp, 0.0)
       @connections[sp] << cs unless @connections[sp].include?(cs)
       @connections[ep] << ce unless @connections[ep].include?(ce)
-      @walls << Geom::Wall.new(Geom::Edge.new(sp,ep), thickness, height, "wall_#{@walls.length}")
+      @walls << Wall3D.new(Geom::Edge.new(sp,ep), thickness, height, "wall_#{@walls.length}")
     end
 
-    def getverts
-      puts %!<?xml version="1.0" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="100%"
-   height="100%"
-   version="1.1"
-   id="svg2"
-   sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="fofo.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
-  <metadata
-     id="metadata39">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs37">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 0.5 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="1 : 0.5 : 1"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       id="perspective41" />
-  </defs>
-  <sodipodi:namedview
-     inkscape:window-height="758"
-     inkscape:window-width="1280"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     guidetolerance="10.0"
-     gridtolerance="10.0"
-     objecttolerance="10.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
-     pagecolor="#ffffff"
-     id="base"
-     showgrid="false"
-     showborder="false"
-     inkscape:zoom="42.78166"
-     inkscape:cx="4.8177591"
-     inkscape:cy="1049.4872"
-     inkscape:window-x="0"
-     inkscape:window-y="20"
-     inkscape:current-layer="svg2" />
-      !
-
-      @walls.each do |w|
-        color = [rand(155),rand(155),rand(155)]
-        w.outline.faces.each_with_index do |f,i|
-          puts %!
-          <polygon id="#{w.name}_#{i}" points="
-            #{f.vertices[0].x},#{f.vertices[0].y}
-            #{f.vertices[1].x},#{f.vertices[1].y}
-            #{f.vertices[2].x},#{f.vertices[2].y}
-          "
-style="stroke:rgb(0,0,0);fill:rgb(#{color.join(',')});stroke-width:0.01;opacity:0.5"/>
-        !
-        end
-      end
-
-      puts %!</svg>!
+    def to_svg
+      faces = @walls.collect{|w| w.outline.faces}.flatten
+      template = ERB.new(File.read('views/outline.svg.erb'))
+      template.result(binding)
     end
 
     private
