@@ -50,30 +50,31 @@
      id="base"
      showgrid="false"
      showborder="false"
-     inkscape:zoom="42.78166"
-     inkscape:cx="4.8177591"
+     inkscape:zoom="0.04"
+     inkscape:cx="10.0"
      inkscape:cy="1049.4872"
      inkscape:window-x="0"
      inkscape:window-y="20"
+     inkscape:document-units="mm" />
      inkscape:current-layer="svg2" />
 
 <% @vertices.each do |v| %>
 
   <path
      sodipodi:type="arc"
-     style="opacity:1;fill:#0c5c09;fill-opacity:1;stroke:#0000ff;stroke-width:0.01;stroke-miterlimit:4;stroke-dasharray:none"
+     style="opacity:1;fill:#0c5c09;fill-opacity:1;stroke:#0000ff;stroke-width:12.0;stroke-miterlimit:4;stroke-dasharray:none"
      id="path4931"
-     sodipodi:cx="<%= v.x %>"
-     sodipodi:cy="<%= v.y %>"
-     sodipodi:rx="0.019334951"
-     sodipodi:ry="0.019334951"
+     sodipodi:cx="<%= v.x*1000 %>"
+     sodipodi:cy="<%= v.y*1000 %>"
+     sodipodi:rx="16.0"
+     sodipodi:ry="16.0"
      d="M 6.1816599,6.5319185 A 0.019334951,0.019334951 0 1 1 6.14299,6.5319185 A 0.019334951,0.019334951 0 1 1 6.1816599,6.5319185 z" />
 
 <% end %>
 
 <% @faces.each do |face| %>
 
-  <polygon points="<%= face.vertices.collect{|v| [v.x,v.y].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:0.01;fill:rgb(200,200,200);opacity:0.3" />
+  <polygon points="<%= face.vertices.collect{|v| [v.x*1000,v.y*1000].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:8.0;fill:rgb(200,200,200);opacity:0.3" />
 
 <% end %>
 

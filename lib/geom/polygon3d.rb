@@ -119,6 +119,36 @@ module Geom
       area < 0 ? WINDING_CW : WINDING_CCW
     end
 
+    def clone
+      vertices = @vertices.collect{|v| v.clone}
+      faces    = @faces.collect do |f|
+        Triangle3D.new(nil,[
+          vertices[ @vertices.index(f.vertices[0]) ],
+          vertices[ @vertices.index(f.vertices[1]) ],
+          vertices[ @vertices.index(f.vertices[2]) ]
+        ])
+      end
+      Polygon3D.new(vertices,faces)
+    end
+
+    def extrude(distance)
+      top_cap = clone
+      # TODO change .z coordinate for 3D output
+      top_cap.vertices.each{|v| v.x -= distance*0.6; v.y -= distance*0.6}
+      num = @vertices.length
+
+      sides = Array.new(@vertices.length).map!{ Polygon3D.new }
+      sides.each_with_index do |side,i|
+        j = (i+1) % num
+        side.vertices.push(@vertices[i],top_cap.vertices[j],top_cap.vertices[i])
+        side.vertices.push(@vertices[i],@vertices[j],top_cap.vertices[j])
+        side.faces.push(Triangle3D.new(nil,side.vertices[0..2]))
+        side.faces.push(Triangle3D.new(nil,side.vertices[3..5]))
+      end
+
+      sides+[top_cap]
+    end
+
     private
       def triangulate
         result  = Array.new

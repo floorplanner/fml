@@ -11,6 +11,7 @@ module Floorplanner
       @inner = @baseline.offset(@thickness/2.0)
       @outer = @baseline.offset(-@thickness/2.0)
       @openings = Array.new
+      @extrusion = nil
     end
 
     def update(num_start_connections,num_end_connections)
@@ -39,6 +40,7 @@ module Floorplanner
       @outline.vertices.reverse!
 
       if @outline.update
+        @extrusion = @outline.extrude(@height)
       end
     end
 
@@ -47,7 +49,7 @@ module Floorplanner
     end
 
     def faces
-      @outline.faces
+      @outline.faces + @extrusion.collect{|f| f.faces}.flatten
     end
   end
 end

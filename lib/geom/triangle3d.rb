@@ -10,6 +10,10 @@ module Geom
       create_normal
     end
 
+    def clone
+      Triangle3D.new(@vertices.collect{|v| v.clone})
+    end
+
     private
       def create_normal
         vn0 = @vertices[0].position.clone
