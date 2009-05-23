@@ -2,6 +2,7 @@ module Floorplanner
   class WallBuilder < Geom::TriangleMesh3D
     # TODO move to config
     SNAP = 0.01
+    attr_accessor(:walls)
     def initialize(&block)
       super()
       @connections = Hash.new
@@ -28,16 +29,6 @@ module Floorplanner
       @connections[sp] << cs unless @connections[sp].include?(cs)
       @connections[ep] << ce unless @connections[ep].include?(ce)
       @walls << Wall3D.new(Geom::Edge.new(sp,ep), thickness, height, "wall_#{@walls.length}")
-    end
-
-    def to_dae
-      template = ERB.new(File.read('views/design.dae.erb'))
-      template.result(binding)
-    end
-
-    def to_svg(envelope=false)
-      template = ERB.new(File.read('views/outline.svg.erb'))
-      template.result(binding)
     end
 
     private

@@ -131,10 +131,10 @@ module Geom
       Polygon3D.new(vertices,faces)
     end
 
-    def extrude(distance)
+    # TODO make it extrude using direction vector
+    def extrude(distance,direction=nil)
       top_cap = clone
-      # TODO change .z coordinate for 3D output
-      top_cap.vertices.each{|v| v.x -= distance*0.6; v.y -= distance*0.6}
+      top_cap.vertices.each{|v| v.z -= distance}
       num = @vertices.length
 
       sides = Array.new(@vertices.length).map!{ Polygon3D.new }

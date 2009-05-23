@@ -15,10 +15,10 @@ module Floorplanner
     end
 
     def area(vertices,color)
-    end
-
-    def to_svg(envelope=true)
-      ""
+      vertices.each{|v| puts v}
+      p = Geom::Polygon3D.new(vertices,nil,color)
+      p.update
+      @polys << p
     end
   end
 end

@@ -47,11 +47,11 @@ module Floorplanner
     end
 
     def vertices
-      @outline.vertices
+      @outline.vertices + @extrusion.collect{|p| p.vertices}.flatten
     end
 
     def faces
-      @outline.faces + @extrusion.collect{|f| f.faces}.flatten
+      @outline.faces + @extrusion.collect{|p| p.faces}.flatten
     end
   end
 end
