@@ -1,10 +1,11 @@
 module Floorplanner
-  class WallBuilder
+  class WallBuilder < Geom::TriangleMesh3D
     # TODO move to config
     SNAP = 0.01
     def initialize(&block)
+      super()
       @connections = Hash.new
-      @vertices = Array.new
+      @base_vertices = Array.new
       @walls = Array.new
       block.call(self)
       update
@@ -14,7 +15,7 @@ module Floorplanner
       if existing = find_vertex(vertex)
         existing
       else
-        @vertices << vertex
+        @base_vertices << vertex
         vertex
       end
     end
@@ -29,8 +30,12 @@ module Floorplanner
       @walls << Wall3D.new(Geom::Edge.new(sp,ep), thickness, height, "wall_#{@walls.length}")
     end
 
+    def to_dae
+      template = ERB.new(File.read('views/design.dae.erb'))
+      template.result(binding)
+    end
+
     def to_svg
-      faces = @walls.collect{|w| w.outline.faces}.flatten
       template = ERB.new(File.read('views/outline.svg.erb'))
       template.result(binding)
     end
@@ -48,7 +53,7 @@ module Floorplanner
       end
 
       def find_vertex(v)
-        @vertices.each do |vertex|
+        @base_vertices.each do |vertex|
           if v.equal?(vertex,SNAP)
             return vertex
           end
@@ -57,7 +62,7 @@ module Floorplanner
       end
 
       def update
-        @vertices.each do |v|
+        @base_vertices.each do |v|
           connections = @connections[v]
           next if connections.length.zero?
 
@@ -107,11 +112,16 @@ module Floorplanner
           end
         end
 
-        @walls.each do |w|
-          num_start = @connections[w.baseline.start_point].length
-          num_end   = @connections[w.baseline.end_point].length
-          w.update(num_start,num_end)
+        @walls.each do |wall|
+          num_start = @connections[wall.baseline.start_point].length
+          num_end   = @connections[wall.baseline.end_point].length
+          wall.update(num_start,num_end)
+
+          @vertices.concat(wall.vertices)
+          @faces.concat(wall.faces)
         end
+        @vertices.uniq!
       end
+
   end
 end

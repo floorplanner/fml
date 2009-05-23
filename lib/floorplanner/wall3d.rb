@@ -2,6 +2,7 @@ module Floorplanner
   class Wall3D < Geom::TriangleMesh3D
     attr_accessor(:baseline,:outline,:inner,:outer,:name)
     def initialize(baseline,thickness,height,name)
+      super()
       @baseline = baseline
       @thickness = thickness
       @height = height
@@ -39,6 +40,14 @@ module Floorplanner
 
       if @outline.update
       end
+    end
+
+    def vertices
+      @outline.vertices
+    end
+
+    def faces
+      @outline.faces
     end
   end
 end

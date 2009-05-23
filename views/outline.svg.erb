@@ -57,7 +57,7 @@
      inkscape:window-y="20"
      inkscape:current-layer="svg2" />
 
-<% faces.each do |face| %>
+<% @faces.each do |face| %>
 
   <polygon points="<%= face.vertices.collect{|v| [v.x,v.y].join(',')}.join(' ') %>" style="stroke:rgb(0,0,0);stroke-width:0.01;fill:none" />
 

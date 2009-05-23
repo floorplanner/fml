@@ -29,13 +29,10 @@ module Geom
     end
 
     def area
+      # remove duplicates and invisibles
       return nil if @vertices.length < 3
-      # ?
-      if @vertices.length == 3 
-        @vertices.each do |v|
-          return 0 if @vertices.grep(v).length > 1
-        end
-      end
+      @vertices.each{|v| return 0 if @vertices.grep(v).length>1}
+
       result = 0
       points = @vertices.dup
       plane  = self.plane
@@ -118,6 +115,10 @@ module Geom
       result
     end
 
+    def winding
+      area < 0 ? WINDING_CW : WINDING_CCW
+    end
+
     private
       def triangulate
         result  = Array.new
@@ -126,6 +127,7 @@ module Geom
         count   = num*2
         indices = Hash.new
 
+        points.reverse! if winding == WINDING_CW
         return [ [0,1,2] ] if num == 3
         points.each_with_index do |p,i|
           indices[p] = i
