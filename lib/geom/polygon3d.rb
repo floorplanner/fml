@@ -54,7 +54,7 @@ module Geom
         coord = AXIS_Y
       end
 
-      points.push(points[0].clone,points[1].clone)
+      points.push(points[0],points[1])
 
       # compute area of the 2D projection
       points.each_with_index do |point,i|

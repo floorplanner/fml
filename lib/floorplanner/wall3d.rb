@@ -16,24 +16,24 @@ module Floorplanner
       @outline = Geom::Polygon3D.new
       if num_start_connections == 2
         @outline.vertices.push(
-          @outer.start_point.clone,
-          @inner.start_point.clone)
+          @outer.start_point,
+          @inner.start_point)
       else
         @outline.vertices.push(
-          @outer.start_point.clone,
-          @baseline.start_point.clone,
-          @inner.start_point.clone)
+          @outer.start_point,
+          @baseline.start_point,
+          @inner.start_point)
       end
 
       if num_end_connections == 2
         @outline.vertices.push(
-          @inner.end_point.clone,
-          @outer.end_point.clone)
+          @inner.end_point,
+          @outer.end_point)
       else
         @outline.vertices.push(
-          @inner.end_point.clone,
-          @baseline.end_point.clone,
-          @outer.end_point.clone)
+          @inner.end_point,
+          @baseline.end_point,
+          @outer.end_point)
       end
       @outline.vertices.reverse!
 

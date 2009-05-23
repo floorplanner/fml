@@ -13,9 +13,9 @@ module Geom
 
     def self.three_points(p0,p1,p2)
       plane = Plane3D.new
-      n0 = p0.instance_of?(Number3D) ? p0 : p0.position.clone
-      n1 = p1.instance_of?(Number3D) ? p1 : p1.position.clone
-      n2 = p2.instance_of?(Number3D) ? p2 : p2.position.clone
+      n0 = p0.instance_of?(Number3D) ? p0 : p0.position
+      n1 = p1.instance_of?(Number3D) ? p1 : p1.position
+      n2 = p2.instance_of?(Number3D) ? p2 : p2.position
       plane.set_three_points(n0,n1,n2)
       plane
     end
