@@ -3,6 +3,11 @@ module Floorplanner
     def initialize(&block)
       super()
       block.call(self)
+      update
+    end
+
+    def each(&block)
+      @polys.each{|p| block.call(p)}
     end
 
     def vertex(v)
@@ -15,10 +20,25 @@ module Floorplanner
     end
 
     def area(vertices,color)
-      vertices.each{|v| puts v}
-      p = Geom::Polygon3D.new(vertices,nil,color)
-      p.update
-      @polys << p
+      @polys << Geom::Polygon3D.new(vertices,nil,color)
     end
+
+    private
+      def update
+        @polys.each do |p|
+          p.update
+          @faces.concat(p.faces)
+          @vertices.concat(p.vertices)
+        end
+        # remove same instances
+        @vertices.uniq!
+        # remove same vertexes
+        old = @vertices.dup
+        @vertices = Array.new
+        old.each do |v|
+          @vertices.push(v) unless @vertices.include?(v)
+        end
+      end
+
   end
 end

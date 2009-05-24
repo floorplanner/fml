@@ -1,13 +1,13 @@
 # Floorplanner.com
-# <%= @name %>
-<% @walls.vertices.each do |v| %>
+# <%= @name %><% verts = @areas.vertices+@walls.vertices %>
+<% verts.each do |v| %>
 v <%= [v.x,-v.z,v.y].join(' ') %><% end %>
 <% 
-  @walls.faces.each do |f|
+  (@areas.faces+@walls.faces).each do |f|
     v = [
-      @walls.vertices.index(f.vertices[0]),
-      @walls.vertices.index(f.vertices[1]),
-      @walls.vertices.index(f.vertices[2])
+      verts.index(f.vertices[0]),
+      verts.index(f.vertices[1]),
+      verts.index(f.vertices[2])
     ] 
     if v.compact.length == 3 %>
 f <%= v.collect{|w|w+1}.join(' ') %><% end ; end %>

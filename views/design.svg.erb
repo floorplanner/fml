@@ -32,8 +32,10 @@
     </rdf:RDF>
   </metadata>
 <% 
-
   @walls.each do |wall| %>
   <polygon points="<%= wall.outline.vertices.collect{|v| [(v.x+mod_x)*ratio,(v.y+mod_y)*ratio].join(',')}.join(' ') %>" style="fill:<%= wall.color %>;stroke-width:1;stroke:rgb(0,0,0);stroke-linejoin:round"/><% end %>
+<%
+  @areas.each do |area| %>
+  <polygon points="<%= area.vertices.collect{|v| [(v.x+mod_x)*ratio,(v.y+mod_y)*ratio].join(',')}.join(' ') %>" style="fill:<%= area.color %>;stroke-width:1;stroke:rgb(0,0,0);stroke-linejoin:round"/><% end %>
 
 </svg>

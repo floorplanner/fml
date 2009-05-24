@@ -25,16 +25,16 @@ module Floorplanner
       end
       @areas = AreaBuilder.new do |b|
         fml.find(AREAS_QUERY.call(id)).each do |area|
-          floats = area.find('points').first.content.split(/\s|\,/).map! {|f| f.to_f}
           color  = area.find('color').first.content
 
-          num = (floats.length/3).to_i
-          vertices = Array.new(num)
-          num.times do |i|
-            vertices << b.vertex(Geom::Vertex3D.new(*floats[i..(i+2)]))
+          vertices = Array.new
+          area.find('points').first.content.split(',').each do |str_v|
+            floats = str_v.strip.split(/\s/).map! {|f| f.to_f}
+            vertices << b.vertex(Geom::Vertex3D.new(*floats[0..2]))
+            vertices << b.vertex(Geom::Vertex3D.new(*floats[3..5]))
           end
 
-          # b.area(vertices,color)
+          b.area(vertices,color)
         end
       end
     end
