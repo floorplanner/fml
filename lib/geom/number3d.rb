@@ -49,6 +49,10 @@ module Geom
       @y -= v.y
       @z -= v.z
     end
+
+    def distance(other)
+      Math.sqrt( (@z-other.z)**2 + Math.sqrt((@x-other.x)**2+(@y-other.y)**2)**2 )
+    end
     
     def == (other)
       @x == other.x &&

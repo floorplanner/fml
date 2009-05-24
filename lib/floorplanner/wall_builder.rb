@@ -2,7 +2,6 @@ module Floorplanner
   class WallBuilder < Geom::TriangleMesh3D
     # TODO move to config
     SNAP = 0.01
-    attr_accessor(:walls)
     def initialize(&block)
       super()
       @connections = Hash.new
@@ -10,6 +9,14 @@ module Floorplanner
       @walls = Array.new
       block.call(self)
       update
+    end
+
+    def each(&block)
+      @walls.each{|w| block.call(w)}
+    end
+
+    def collect(&block)
+      @walls.collect{|w| block.call(w)}
     end
 
     def vertex(vertex)

@@ -1,2 +1,7 @@
 content_server: cdn.floorplanner.com
 fml_schema: xml/fml.rng
+views_path: views
+svg:
+  width:   1024
+  height:  1024
+  padding: 0.8

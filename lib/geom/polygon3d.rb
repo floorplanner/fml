@@ -140,8 +140,8 @@ module Geom
       sides = Array.new(@vertices.length).map!{ Polygon3D.new }
       sides.each_with_index do |side,i|
         j = (i+1) % num
-        side.vertices.push(@vertices[i],top_cap.vertices[j],top_cap.vertices[i])
-        side.vertices.push(@vertices[i],@vertices[j],top_cap.vertices[j])
+        side.vertices.push(top_cap.vertices[j],@vertices[i],top_cap.vertices[i])
+        side.vertices.push(@vertices[i],top_cap.vertices[j],@vertices[j])
         side.faces.push(Triangle3D.new(side.vertices[0..2]))
         side.faces.push(Triangle3D.new(side.vertices[3..5]))
       end

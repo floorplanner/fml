@@ -1,7 +1,7 @@
 module Geom
   class TriangleMesh3D
     attr_accessor(:vertices,:faces,:polys,:color)
-    def initialize(vertices=nil,faces=nil,color="#cccccc")
+    def initialize(vertices=nil,faces=nil,color="#000000")
       @polys    = Array.new
       @vertices = vertices || Array.new
       @faces    = faces || Array.new

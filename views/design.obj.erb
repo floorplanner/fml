@@ -1,6 +1,7 @@
+# Floorplanner.com
+# <%= @name %>
 <% @walls.vertices.each do |v| %>
-v <%= [v.x,-v.z,v.y].join(' ') %>
-<% end %>
+v <%= [v.x,-v.z,v.y].join(' ') %><% end %>
 <% 
   @walls.faces.each do |f|
     v = [
@@ -9,5 +10,4 @@ v <%= [v.x,-v.z,v.y].join(' ') %>
       @walls.vertices.index(f.vertices[2])
     ] 
     if v.compact.length == 3 %>
-f <%= v.collect{|w|w+1}.join(' ') %>
-<% end ; end %>
+f <%= v.collect{|w|w+1}.join(' ') %><% end ; end %>
