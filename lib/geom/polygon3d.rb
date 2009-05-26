@@ -8,6 +8,10 @@ module Geom
     AXIS_Y       = 2
     AXIS_Z       = 3
 
+    CAP_TOP      = 4
+    CAP_BASE     = 5
+    CAP_BOTH     = 6
+
     attr_accessor(:vertices,:faces)
 
     def update
@@ -131,10 +135,15 @@ module Geom
       Polygon3D.new(vertices,faces)
     end
 
-    # TODO make it extrude using direction vector
-    def extrude(distance,direction=nil)
+    def extrude(distance,direction,cap=CAP_BOTH)
+      direction.normalize
       top_cap = clone
-      top_cap.vertices.each{|v| v.z -= distance}
+      top_cap.vertices.each do |v|
+        v.x += distance*direction.x
+        v.y += distance*direction.y
+        v.z += distance*direction.z
+      end
+      top_cap.faces.each {|f| f.normal = direction }
       num = @vertices.length
 
       sides = Array.new(@vertices.length).map!{ Polygon3D.new }
@@ -146,7 +155,18 @@ module Geom
         side.faces.push(Triangle3D.new(side.vertices[3..5]))
       end
 
-      sides+[top_cap]
+      case cap
+      when CAP_BASE
+        top_cap.faces.clear
+      when CAP_TOP
+        self.faces.clear
+      when CAP_BOTH
+        self.faces.each do |f|
+          f.flip_normal
+        end
+      end
+
+      sides + [top_cap]
     end
 
     private

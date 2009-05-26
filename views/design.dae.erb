@@ -39,12 +39,12 @@
       <mesh>
         <source id="walls-positions" name="position">
 
-          <float_array id="walls-positions-array" count="<%= @vertices.length*3 %>">
-            <%= @vertices.collect{|v| [v.x,v.y,v.z].join(' ')}.join(' ') %>
+          <float_array id="walls-positions-array" count="<%= @walls.vertices.length*3 %>">
+            <%= @walls.vertices.collect{|v| [v.x,v.y,v.z].join(' ')}.join(' ') %>
           </float_array>
 
           <technique_common>
-            <accessor count="<%= @vertices.length %>" offset="0" source="#walls-positions-array" stride="3">
+            <accessor count="<%= @walls.vertices.length %>" offset="0" source="#walls-positions-array" stride="3">
               <param name="X" type="float"></param>
               <param name="Y" type="float"></param>
               <param name="Z" type="float"></param>
@@ -53,12 +53,12 @@
         </source>
         <source id="walls-normals" name="normal">
 
-          <float_array id="walls-normals-array" count="<%= @faces.length*3 %>">
-            <%= @faces.collect{|f| [f.face_normal.x,f.face_normal.y,f.face_normal.z]}.flatten.join(' ') %>
+          <float_array id="walls-normals-array" count="<%= @walls.faces.length*3 %>">
+            <%= @walls.faces.collect{|f| [f.normal.x,f.normal.y,f.normal.z]}.flatten.join(' ') %>
           </float_array>
 
           <technique_common>
-            <accessor count="<%= @faces.length %>" offset="0" source="#walls-normals-array" stride="3">
+            <accessor count="<%= @walls.faces.length %>" offset="0" source="#walls-normals-array" stride="3">
               <param name="X" type="float"></param>
               <param name="Y" type="float"></param>
               <param name="Z" type="float"></param>
@@ -70,11 +70,10 @@
           <input semantic="POSITION" source="#walls-positions"/>
         </vertices>
 
-        <triangles count="<%= @faces.length %>">
+        <triangles count="<%= @walls.faces.length %>">
            <input semantic="VERTEX" source="#walls-vertices" offset="0"/>
-           <input semantic="NORMAL" source="#walls-normals" offset="1"/>
            <p>
-             <%= @faces.collect{|f| f.vertices.collect{|v| vertices.index(v)}}.flatten.join(' ') %>
+             <%= @walls.faces.collect{|f| f.vertices.collect{|v| @walls.vertices.index(v)}}.flatten.join(' ') %>
            </p>
         </triangles>
       </mesh>

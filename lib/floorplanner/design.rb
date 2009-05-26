@@ -42,7 +42,7 @@ module Floorplanner
     def to_dae
       template = ERB.new(
         File.read(
-          File.join(Floorplanner.config['views_path'],'views/design.dae.erb')))
+          File.join(Floorplanner.config['views_path'],'design.dae.erb')))
       template.result(binding)
     end
 

@@ -1,7 +1,6 @@
 module Geom
   class Edge
     attr_accessor(:start_point,:end_point)
-    UP = Number3D.new(0,0,1)
     def initialize(sp,ep)
       @start_point = sp
       @end_point = ep
@@ -18,7 +17,8 @@ module Geom
       Math.sqrt(x*x + y*y + z*z);
     end
 
-    def offset(distance,up=UP)
+    def offset(distance,up)
+      up.normalize
       edge = self.clone
       dir  = self.direction
 

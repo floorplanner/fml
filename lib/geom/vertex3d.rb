@@ -2,11 +2,12 @@ require 'forwardable'
 
 module Geom
   class Vertex3D
-    attr_accessor(:position)
+    attr_accessor(:position,:normal)
     extend Forwardable
     def_delegators :@position, :x, :y, :z, :x=, :y=, :z=
-    def initialize(x=0.0,y=0.0,z=0.0)
+    def initialize(x=0.0,y=0.0,z=0.0,normal=nil)
       @position = Number3D.new(x,y,z)
+      @normal = normal
     end
 
     def == (other)

@@ -1,5 +1,6 @@
 module Floorplanner
   class Wall3D < Geom::TriangleMesh3D
+    UP = Geom::Number3D.new(0,0,1)
     attr_accessor(:baseline,:outline,:inner,:outer,:name)
     def initialize(baseline,thickness,height,name)
       super()
@@ -8,8 +9,8 @@ module Floorplanner
       @height = height
       @name = name
 
-      @inner = @baseline.offset(@thickness/2.0)
-      @outer = @baseline.offset(-@thickness/2.0)
+      @inner = @baseline.offset(@thickness/2.0,UP)
+      @outer = @baseline.offset(-@thickness/2.0,UP)
       @openings = Array.new
       @extrusion = nil
     end
@@ -41,7 +42,7 @@ module Floorplanner
       @outline.color = "#ff9999"
 
       if @outline.update
-        @extrusion = @outline.extrude(@height)
+        @extrusion = @outline.extrude(@height,UP)
         @polys.push(@outline,*@extrusion)
       end
     end
