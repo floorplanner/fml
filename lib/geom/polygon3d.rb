@@ -12,8 +12,6 @@ module Geom
     CAP_BASE     = 5
     CAP_BOTH     = 6
 
-    attr_accessor(:vertices,:faces)
-
     def update
       return false if @vertices.length < 3
       triangles = triangulate

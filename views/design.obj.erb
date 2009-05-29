@@ -2,7 +2,7 @@
 # <%= @name %>
 <% @walls.vertices.each do |v| %>
 v <%= [v.x,v.z,v.y].join(' ') %><% end %>
-<% 
+<%
   @walls.faces.each do |f|
     v = [
       @walls.vertices.index(f.vertices[0]),

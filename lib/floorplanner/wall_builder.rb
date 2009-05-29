@@ -39,95 +39,94 @@ module Floorplanner
     end
 
     private
-      def find_wall(sp,ep)
-        @walls.each do |wall|
-          if wall.baseline.start_point.equal?(sp,SNAP) && wall.baseline.end_point.equal?(ep,SNAP)
-            return wall
-          elsif wall.baseline.end_point.equal?(sp,SNAP) && wall.baseline.start_point.equal?(ep,SNAP)
-            return wall
-          end
+
+    def find_wall(sp,ep)
+      @walls.each do |wall|
+        if wall.baseline.start_point.equal?(sp,SNAP) && wall.baseline.end_point.equal?(ep,SNAP)
+          return wall
+        elsif wall.baseline.end_point.equal?(sp,SNAP) && wall.baseline.start_point.equal?(ep,SNAP)
+          return wall
         end
-        nil
       end
+      nil
+    end
 
-      def find_vertex(v)
-        @base_vertices.each do |vertex|
-          if v.equal?(vertex,SNAP)
-            return vertex
-          end
+    def find_vertex(v)
+      @base_vertices.each do |vertex|
+        if v.equal?(vertex,SNAP)
+          return vertex
         end
-        return nil
       end
+      return nil
+    end
 
-      def update
-        @base_vertices.each do |v|
-          connections = @connections[v]
-          next if connections.length.zero?
+    def update
+      @base_vertices.each do |v|
+        connections = @connections[v]
+        next if connections.length.zero?
 
-          connections.each do |c|
-            x = c.point.x - v.x
-            y = c.point.y - v.y
-            c.angle = Math.atan2(y,x)
-          end
-          connections.sort! {|a,b| a.angle <=> b.angle}
-          connections.each_index do |i|
-            j = (i+1) % connections.length
+        connections.each do |c|
+          x = c.point.x - v.x
+          y = c.point.y - v.y
+          c.angle = Math.atan2(y,x)
+        end
+        connections.sort! {|a,b| a.angle <=> b.angle}
+        connections.each_index do |i|
+          j = (i+1) % connections.length
 
-            w0 , w1 = find_wall(v,connections[i].point),
-                      find_wall(v,connections[j].point)
+          w0 , w1 = find_wall(v,connections[i].point),
+                    find_wall(v,connections[j].point)
 
-            flipped0 , flipped1 = (w0.baseline.end_point == v),
-                                  (w1.baseline.end_point == v)
+          flipped0 , flipped1 = (w0.baseline.end_point == v),
+                                (w1.baseline.end_point == v)
 
-            e0 , e1 = flipped0 ? w0.outer : w0.inner,
-                      flipped1 ? w1.inner : w1.outer
+          e0 , e1 = flipped0 ? w0.outer : w0.inner,
+                    flipped1 ? w1.inner : w1.outer
 
-            isect = Geom::Intersection.line_line(e0.start_point.position,e0.end_point.position,e1.start_point.position,e1.end_point.position,true)
+          isect = Geom::Intersection.line_line(e0.start_point.position,e0.end_point.position,e1.start_point.position,e1.end_point.position,true)
 
-            if isect.status == Geom::Intersection::INTERSECTION
-              # the two edges intersect!
-              # adjust the edges so they touch at the intersection.
-              if isect.alpha[0].abs < 2
-                if flipped0
-                  e0.end_point.x   = isect.points[0].x
-                  e0.end_point.y   = isect.points[0].y
-                else
-                  e0.start_point.x = isect.points[0].x
-                  e0.start_point.y = isect.points[0].y
-                end
-
-                if flipped1
-                  e1.end_point.x   = isect.points[0].x
-                  e1.end_point.y   = isect.points[0].y
-                else
-                  e1.start_point.x = isect.points[0].x
-                  e1.start_point.y = isect.points[0].y
-                end
+          if isect.status == Geom::Intersection::INTERSECTION
+            # the two edges intersect!
+            # adjust the edges so they touch at the intersection.
+            if isect.alpha[0].abs < 2
+              if flipped0
+                e0.end_point.x   = isect.points[0].x
+                e0.end_point.y   = isect.points[0].y
               else
-                # parallel
+                e0.start_point.x = isect.points[0].x
+                e0.start_point.y = isect.points[0].y
               end
+
+              if flipped1
+                e1.end_point.x   = isect.points[0].x
+                e1.end_point.y   = isect.points[0].y
+              else
+                e1.start_point.x = isect.points[0].x
+                e1.start_point.y = isect.points[0].y
+              end
+            else
+              # parallel
             end
           end
         end
-
-        @walls.each do |wall|
-          num_start = @connections[wall.baseline.start_point].length
-          num_end   = @connections[wall.baseline.end_point].length
-          wall.update(num_start,num_end)
-
-          @vertices.concat(wall.vertices)
-          @faces.concat(wall.faces)
-          @polys.concat(wall.polys)
-        end
-        # remove same instances
-        @vertices.uniq!
-        # remove same vertexes
-        old = @vertices.dup
-        @vertices = Array.new
-        old.each do |v|
-          @vertices.push(v) unless @vertices.include?(v)
-        end
       end
 
+      @walls.each do |wall|
+        num_start = @connections[wall.baseline.start_point].length
+        num_end   = @connections[wall.baseline.end_point].length
+        wall.update(num_start,num_end)
+
+        @vertices.concat(wall.vertices)
+        @faces.concat(wall.faces)
+      end
+      # remove same instances
+      @vertices.uniq!
+      # remove same vertexes
+      old = @vertices.dup
+      @vertices = Array.new
+      old.each do |v|
+        @vertices.push(v) unless @vertices.include?(v)
+      end
+    end
   end
 end
