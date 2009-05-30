@@ -133,7 +133,7 @@ module Geom
       Polygon3D.new(vertices,faces)
     end
 
-    def extrude(distance,direction,cap=CAP_BOTH)
+    def extrude(distance,direction,cap=CAP_BOTH,update=true)
       direction.normalize
       top_cap = clone
       top_cap.vertices.each do |v|
@@ -147,10 +147,10 @@ module Geom
       sides = Array.new(@vertices.length).map!{ Polygon3D.new }
       sides.each_with_index do |side,i|
         j = (i+1) % num
-        side.vertices.push(top_cap.vertices[j],@vertices[i],top_cap.vertices[i])
-        side.vertices.push(@vertices[i],top_cap.vertices[j],@vertices[j])
-        side.faces.push(Triangle3D.new(side.vertices[0..2]))
-        side.faces.push(Triangle3D.new(side.vertices[3..5]))
+        side.vertices.push(top_cap.vertices[i],top_cap.vertices[j])
+        side.vertices.push(@vertices[j],@vertices[i])
+        side.data[:side] = true
+        side.update if update
       end
 
       case cap
@@ -175,8 +175,8 @@ module Geom
         count   = num*2
         indices = Hash.new
 
-        points.reverse! if winding == WINDING_CW
         return [ [0,1,2] ] if num == 3
+        points.reverse! if winding == WINDING_CW
         points.each_with_index do |p,i|
           indices[p] = i
         end

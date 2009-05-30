@@ -36,6 +36,39 @@ module Geom
       ]
     end
 
+    def self.rotationX(rad)
+      c = Math.cos(rad)
+      s = Math.sin(rad)
+
+      self[
+        [1,0, 0,0],
+        [0,c,-s,0],
+        [0,s, c,0],
+        [0,0, 0,1],
+      ]
+    end
+
+    def self.rotationZ(rad)
+      c  = Math.cos(rad)
+      s  = Math.sin(rad)
+
+      self[
+        [c,-s,0,0],
+        [s, c,0,0],
+        [0, 0,1,0],
+        [0, 0,0,1]
+      ]
+    end
+
+    def self.translation(x,y,z)
+      self[
+        [1,0,0,x],
+        [0,1,0,y],
+        [0,0,1,z],
+        [0,0,0,1]
+      ]
+    end
+
     def self.multiply_vector_3x3(m,v)
       ma = m.to_a
       vx = v.x

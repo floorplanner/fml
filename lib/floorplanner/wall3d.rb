@@ -14,7 +14,11 @@ module Floorplanner
       @openings = Array.new
     end
 
-    def update(num_start_connections,num_end_connections)
+    def opening(position,size)
+      @openings << {:position => position, :size => size}
+    end
+
+    def prepare(num_start_connections,num_end_connections)
       @outline = Geom::Polygon3D.new
       if num_start_connections == 1 || num_start_connections == 2
         @outline.vertices.push(
@@ -38,12 +42,18 @@ module Floorplanner
           @outer.end_point)
       end
       @outline.vertices.reverse!
-      @outline.color = "#ff9999"
+      @outline.data[:color] = "#ff9999"
+    end
 
-      if @outline.update
-        @meshes << @outline
-        @meshes.concat(@outline.extrude(@height,UP))
+    def update
+      @openings.each do |opening|
+        op = Opening3D.new(@baseline,@thickness,opening)
+        op.update
+        @meshes << op
       end
+      @outline.update
+      @meshes << @outline
+      @meshes.concat(@outline.extrude(@height,UP))
     end
   end
 end

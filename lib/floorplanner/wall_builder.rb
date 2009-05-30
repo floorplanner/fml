@@ -8,7 +8,6 @@ module Floorplanner
       @base_vertices = Array.new
       @walls = Array.new
       block.call(self)
-      update
     end
 
     def each(&block)
@@ -38,29 +37,23 @@ module Floorplanner
       @walls << Wall3D.new(Geom::Edge.new(sp,ep), thickness, height, "wall_#{@walls.length}")
     end
 
-    private
-
-    def find_wall(sp,ep)
+    # call after adding walls
+    def opening(position,size)
       @walls.each do |wall|
-        if wall.baseline.start_point.equal?(sp,SNAP) && wall.baseline.end_point.equal?(ep,SNAP)
-          return wall
-        elsif wall.baseline.end_point.equal?(sp,SNAP) && wall.baseline.start_point.equal?(ep,SNAP)
-          return wall
+        if wall.outline.point_inside(position)
+          wall.opening(position,size)
         end
       end
-      nil
     end
 
-    def find_vertex(v)
-      @base_vertices.each do |vertex|
-        if v.equal?(vertex,SNAP)
-          return vertex
-        end
+    def update_sides
+      @walls.each do |wall|
+        wall.update_sides
+        @faces.concat(wall.faces)
       end
-      return nil
     end
 
-    def update
+    def prepare
       @base_vertices.each do |v|
         connections = @connections[v]
         next if connections.length.zero?
@@ -114,8 +107,14 @@ module Floorplanner
       @walls.each do |wall|
         num_start = @connections[wall.baseline.start_point].length
         num_end   = @connections[wall.baseline.end_point].length
-        wall.update(num_start,num_end)
+        wall.prepare(num_start,num_end)
+      end
+    end
 
+    def update
+      @walls.each do |wall|
+        wall.update
+        # here comes the cache
         @vertices.concat(wall.vertices)
         @faces.concat(wall.faces)
       end
@@ -127,6 +126,28 @@ module Floorplanner
       old.each do |v|
         @vertices.push(v) unless @vertices.include?(v)
       end
+    end
+
+    private
+
+    def find_wall(sp,ep)
+      @walls.each do |wall|
+        if wall.baseline.start_point.equal?(sp,SNAP) && wall.baseline.end_point.equal?(ep,SNAP)
+          return wall
+        elsif wall.baseline.end_point.equal?(sp,SNAP) && wall.baseline.start_point.equal?(ep,SNAP)
+          return wall
+        end
+      end
+      nil
+    end
+
+    def find_vertex(v)
+      @base_vertices.each do |vertex|
+        if v.equal?(vertex,SNAP)
+          return vertex
+        end
+      end
+      return nil
     end
   end
 end

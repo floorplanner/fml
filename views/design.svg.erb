@@ -33,10 +33,10 @@
   </metadata>
   <g id="areas"><%
   @areas.each do |area| %>
-  <polygon points="<%= area.vertices.collect{|v| [(v.x+mod_x)*ratio,(v.y+mod_y)*ratio].join(',')}.join(' ') %>" style="fill:<%= area.color %>;stroke-width:1;stroke:rgb(100,100,100);stroke-linejoin:round;stroke-dasharray:1, 1;stroke-dashoffset:0"/><% end %>
+  <polygon points="<%= area.vertices.collect{|v| [(v.x+mod_x)*ratio,(v.y+mod_y)*ratio].join(',')}.join(' ') %>" style="fill:<%= area.data[:color] %>;stroke-width:1;stroke:rgb(100,100,100);stroke-linejoin:round;stroke-dasharray:1, 1;stroke-dashoffset:0"/><% end %>
   </g>
   <g id="walls"><% 
   @walls.each do |wall| %>
-  <polygon points="<%= wall.outline.vertices.collect{|v| [(v.x+mod_x)*ratio,(v.y+mod_y)*ratio].join(',')}.join(' ') %>" style="fill:<%= wall.color %>;stroke-width:1;stroke:rgb(0,0,0);stroke-linejoin:round"/><% end %>
+  <polygon points="<%= wall.outline.vertices.collect{|v| [(v.x+mod_x)*ratio,(v.y+mod_y)*ratio].join(',')}.join(' ') %>" style="fill:<%= wall.data[:color] %>;stroke-width:1;stroke:rgb(0,0,0);stroke-linejoin:round"/><% end %>
   </g>
 </svg>
