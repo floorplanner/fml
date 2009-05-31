@@ -13,22 +13,57 @@ module Floorplanner
       v2 = Geom::Vertex3D.new( width/2,0,0)
       o_base = Geom::Edge.new(v1,v2)
       
-      o_base_inner = o_base.offset(thickness/2.0,Wall3D::UP)
-      o_base_outer = o_base.offset(-thickness/2.0,Wall3D::UP)
+      o_inner = o_base.offset(thickness/2.0,Wall3D::UP)
+      o_outer = o_base.offset(-thickness/2.0,Wall3D::UP)
 
-      p = Geom::Polygon3D.new([
-        o_base_inner.start_point,o_base_inner.end_point,
-        o_base_outer.end_point,o_base_outer.start_point
+      @base = Geom::Polygon3D.new([
+        o_inner.start_point, o_inner.end_point,
+        o_outer.end_point  , o_outer.start_point
       ])
-      p.transform_vertices(Geom::Matrix3D.rotationZ(angle))
-      p.transform_vertices(Geom::Matrix3D.translation(pos.x,pos.y,pos.z+OPENING_LOW))
+      # rotate in wall's direction
+      @base.transform_vertices(Geom::Matrix3D.rotationZ(angle))
+      # move to position
+      @base.transform_vertices(Geom::Matrix3D.translation(pos.x,pos.y,pos.z+OPENING_LOW))
 
-      extrusion = p.extrude(height,Wall3D::UP,Geom::Polygon3D::CAP_BOTH,false)
+      extrusion = @base.extrude(height,Wall3D::UP,nil,false)
+
+      # delete sides
       extrusion.delete_at(0)
       extrusion.delete_at(1)
       
+      @meshes << @base
       @meshes.concat(extrusion)
-      @meshes << p
+    end
+
+    # drill hole to sides by making 'loop' inside
+    # Wall3D's side polygons
+    def drill(poly,outer)
+      vers = poly.vertices
+
+      v1 = Geom::Vertex3D.new
+      v1.x = @base.vertices[outer ? 0 : 2].x
+      v1.y = @base.vertices[outer ? 0 : 2].y
+
+      v2 = @base.vertices[outer ? 0 : 2]
+      v3,v4 = nil,nil
+      if outer
+        v3 = @meshes[2].vertices[outer ? 1 : 0]
+        v4 = @meshes[1].vertices[outer ? 0 : 1]
+      else
+        v3 = @meshes[1].vertices[outer ? 0 : 1]
+        v4 = @meshes[2].vertices[outer ? 1 : 0]
+      end
+      v5 = @base.vertices[outer ? 1 : 3]
+
+      # insert loop
+      offset = 0
+      vers.insert(offset+3,v1)
+      vers.insert(offset+4,v2)
+      vers.insert(offset+5,v3)
+      vers.insert(offset+6,v4)
+      vers.insert(offset+7,v5)
+      vers.insert(offset+8,v2)
+      vers.insert(offset+9,v1)
     end
   end
 end

@@ -19,8 +19,8 @@ module Geom
 
     def offset(distance,up)
       up.normalize
-      edge = self.clone
-      dir  = self.direction
+      edge = clone
+      dir  = direction
 
       Matrix3D.multiply_vector_3x3(Matrix3D.rotation_matrix(up.x,up.y,up.z, -Math::PI/2),dir)
       dir.normalize
@@ -37,6 +37,20 @@ module Geom
       edge.end_point.z += dir.z
 
       edge
+    end
+
+    def extrude(distance,direction)
+      edge = clone
+      [edge.start_point,edge.end_point].each do |v|
+        v.x += distance*direction.x
+        v.y += distance*direction.y
+        v.z += distance*direction.z
+      end
+
+      poly = Polygon3D.new
+      poly.vertices.push(edge.start_point,edge.end_point)
+      poly.vertices.push(@end_point,@start_point)
+      poly
     end
 
     def clone
