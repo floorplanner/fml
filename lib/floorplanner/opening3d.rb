@@ -1,10 +1,11 @@
 module Floorplanner
   class Opening3D < Geom::TriangleMesh3D
     OPENING_LOW = 0.85
+    attr_accessor(:position)
     def initialize(baseline,thickness,opening)
       super()
+      @position = baseline.snap(opening[:position])
       dir = baseline.direction
-      pos = opening[:position]
       angle  = Math.atan2(dir.y,dir.x)
       width  = opening[:size].x
       height = opening[:size].y
@@ -20,10 +21,11 @@ module Floorplanner
         o_inner.start_point, o_inner.end_point,
         o_outer.end_point  , o_outer.start_point
       ])
+
       # rotate in wall's direction
       @base.transform_vertices(Geom::Matrix3D.rotationZ(angle))
       # move to position
-      @base.transform_vertices(Geom::Matrix3D.translation(pos.x,pos.y,pos.z+OPENING_LOW))
+      @base.transform_vertices(Geom::Matrix3D.translation(@position.x,@position.y,@position.z+OPENING_LOW))
 
       extrusion = @base.extrude(height,Wall3D::UP,nil,false)
 
@@ -37,9 +39,21 @@ module Floorplanner
 
     # drill hole to sides by making 'loop' inside
     # Wall3D's side polygons
+    #  
+    #        v3.____>____.v4
+    #          |         |
+    #          ^    ~    v
+    #          |         |
+    #        v2!____<____!v5
+    #          |
+    #          ^v
+    #          |
+    #  ..__<___!v1______<____..
+    #  
     def drill(poly,outer)
       vers = poly.vertices
 
+      # create loop from extrusion vertices
       v1 = Geom::Vertex3D.new
       v1.x = @base.vertices[outer ? 0 : 2].x
       v1.y = @base.vertices[outer ? 0 : 2].y
@@ -56,7 +70,7 @@ module Floorplanner
       v5 = @base.vertices[outer ? 1 : 3]
 
       # insert loop
-      offset = 0
+      offset = outer ? 0 : vers.length - 4
       vers.insert(offset+3,v1)
       vers.insert(offset+4,v2)
       vers.insert(offset+5,v3)

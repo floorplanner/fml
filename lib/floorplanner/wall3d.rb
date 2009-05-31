@@ -54,6 +54,7 @@ module Floorplanner
         @meshes << op
         @openings[i] = op
       end
+      @openings = @openings.sort_by{|o| o.position.distance(@baseline.start_point.position)}
       @outline.update
       @meshes << @outline
 
@@ -77,7 +78,6 @@ module Floorplanner
         # drill hole to side
         @openings.each do |opening|
           opening.drill(poly,outs.include?(v))
-          break
         end
         poly.update
         @meshes << poly

@@ -53,6 +53,10 @@ module Geom
       poly
     end
 
+    def snap(point)
+      point
+    end
+
     def clone
       Edge.new(@start_point.clone,@end_point.clone)
     end
