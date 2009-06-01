@@ -1,5 +1,5 @@
 module Geom
-  class Polygon3D < TriangleMesh3D
+  class Polygon < TriangleMesh
 
     WINDING_CW   = 0
     WINDING_CCW  = 1
@@ -14,10 +14,10 @@ module Geom
 
     def update
       return false if @vertices.length < 3
-      triangles = triangulate
+      triangles = @triangulation.triangulate(self)
       unless triangles
         @vertices.reverse!
-        triangles = triangulate
+        triangles = @triangulation.triangulate(self)
         return false unless triangles
       end
 
@@ -25,7 +25,7 @@ module Geom
         v0 = @vertices[t[0]]
         v1 = @vertices[t[1]]
         v2 = @vertices[t[2]]
-        @faces.push(Triangle3D.new([v2,v1,v0]))
+        @faces.push(Triangle.new([v2,v1,v0]))
       end
       true
     end
@@ -85,9 +85,10 @@ module Geom
       result
     end
 
+    # TODO real plane, not just from first 3 vertices
     def plane
       return nil if @vertices.length < 3
-      Plane3D.three_points(*@vertices[0..2])
+      Plane.three_points(*@vertices[0..2])
     end
 
     def point_inside(pt)
@@ -124,13 +125,13 @@ module Geom
     def clone
       vertices = @vertices.collect{|v| v.clone}
       faces    = @faces.collect do |f|
-        Triangle3D.new([
+        Triangle.new([
           vertices[ @vertices.index(f.vertices[0]) ],
           vertices[ @vertices.index(f.vertices[1]) ],
           vertices[ @vertices.index(f.vertices[2]) ]
         ])
       end
-      Polygon3D.new(vertices,faces)
+      Polygon.new(vertices,faces)
     end
 
     def extrude(distance,direction,cap=CAP_BOTH,update=true)
@@ -144,7 +145,7 @@ module Geom
       top_cap.faces.each {|f| f.normal = direction }
       num = @vertices.length
 
-      sides = Array.new(@vertices.length).map!{ Polygon3D.new }
+      sides = Array.new(@vertices.length).map!{ Polygon.new }
       sides.each_with_index do |side,i|
         j = (i+1) % num
         side.vertices.push(top_cap.vertices[i],top_cap.vertices[j])
@@ -167,71 +168,23 @@ module Geom
       sides + [top_cap]
     end
 
-    private
-      def triangulate
-        result  = Array.new
-        points  = @vertices.dup
-        num     = points.length
-        count   = num*2
-        indices = Hash.new
+    def dominant_axis
+      plane = self.plane
+      return 0 unless plane
 
-        return [ [0,1,2] ] if num == 3
-        points.reverse! if winding == WINDING_CW
-        points.each_with_index do |p,i|
-          indices[p] = i
+      ax = (plane.normal.x > 0 ? plane.normal.x : -plane.normal.x)
+      ay = (plane.normal.y > 0 ? plane.normal.y : -plane.normal.y)
+      az = (plane.normal.z > 0 ? plane.normal.z : -plane.normal.z)
+
+      axis = AXIS_Z
+      if ax > ay
+        if ax > az
+          axis = AXIS_X
         end
-
-        while num > 2
-          return nil if count > num*2 # overflow
-          count += 1
-
-          i = 0
-          while i < num 
-            j = (i+num-1) % num
-            k = (i+1) % num
-
-            if is_ear(points,j,i,k)
-              # save triangle
-              result.push([indices[points[j]],indices[points[i]],indices[points[k]]])
-              # remove vertex
-              points.delete_at(i)
-              num = points.length
-              count = 0
-            end
-            i += 1
-          end
-        end
-        result
+      elsif ay > az
+        axis = AXIS_Y
       end
-
-      def is_ear(points,u,v,w)
-        poly = Polygon3D.new([points[u],points[v],points[w]])
-        return false if poly.area <= 0
-        points.length.times do |i|
-          next if i == u || i == v || i == w
-          return false if poly.point_inside(points[i])
-        end
-        true
-      end
-
-      def dominant_axis
-        plane = self.plane
-        return 0 unless plane
-
-        ax = (plane.normal.x > 0 ? plane.normal.x : -plane.normal.x)
-        ay = (plane.normal.y > 0 ? plane.normal.y : -plane.normal.y)
-        az = (plane.normal.z > 0 ? plane.normal.z : -plane.normal.z)
-
-        axis = AXIS_Z
-        if ax > ay
-          if ax > az
-            axis = AXIS_X
-          end
-        elsif ay > az
-          axis = AXIS_Y
-        end
-        axis
-      end
-
+      axis
+    end
   end
 end

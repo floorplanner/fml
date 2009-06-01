@@ -1,5 +1,5 @@
 module Floorplanner
-  class Wall3D < Geom::TriangleMesh3D
+  class Wall3D < Geom::TriangleMesh
     UP = Geom::Number3D.new(0,0,1)
     attr_accessor(:baseline,:outline,:inner,:outer,:name)
     def initialize(baseline,thickness,height,name)
@@ -21,7 +21,7 @@ module Floorplanner
 
     # create base 'outline' polygon of wall
     def prepare(num_start_connections,num_end_connections)
-      @outline = Geom::Polygon3D.new
+      @outline = Geom::Polygon.new
       if num_start_connections == 1 || num_start_connections == 2
         @outline.vertices.push(
           @outer.start_point,
@@ -80,6 +80,7 @@ module Floorplanner
           opening.drill(poly,outs.include?(v))
         end
         poly.update
+        poly.flip_winding if @openings.length > 0 && starts.include?(j) && starts.include?(j)
         @meshes << poly
       end
     end

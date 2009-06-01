@@ -17,8 +17,8 @@ module Floorplanner
           vertices = Array.new
           area.find('points').first.content.split(',').each do |str_v|
             floats = str_v.strip.split(/\s/).map! {|f| f.to_f}
-            vertices << b.vertex(Geom::Vertex3D.new(*floats[0..2]))
-            vertices << b.vertex(Geom::Vertex3D.new(*floats[3..5]))
+            vertices << b.vertex(Geom::Vertex.new(*floats[0..2]))
+            vertices << b.vertex(Geom::Vertex.new(*floats[3..5]))
           end
 
           b.area(vertices,color)
@@ -31,8 +31,8 @@ module Floorplanner
           thickness = line.find('thickness').first.content.to_f
           height = line.find('height').first.content.to_f
 
-          sp = Geom::Vertex3D.new(*floats[0..2])
-          ep = Geom::Vertex3D.new(*floats[3..5])
+          sp = Geom::Vertex.new(*floats[0..2])
+          ep = Geom::Vertex.new(*floats[3..5])
           sp = b.vertex(sp)
           ep = b.vertex(ep)
           b.wall(sp,ep,thickness,height)
@@ -90,6 +90,11 @@ module Floorplanner
         File.read(
           File.join(Floorplanner.config['views_path'],'design.obj.erb')))
       template.result(binding)
+    end
+
+    def display_gl
+      d = Geom::DisplayGL.new(@walls,"Floorplanner Design")
+      d.display
     end
   end
 end

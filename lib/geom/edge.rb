@@ -47,9 +47,10 @@ module Geom
         v.z += distance*direction.z
       end
 
-      poly = Polygon3D.new
-      poly.vertices.push(edge.start_point,edge.end_point)
-      poly.vertices.push(@end_point,@start_point)
+      poly = Polygon.new
+      poly.vertices.push(
+        edge.end_point , edge.start_point,
+        @start_point   , @end_point)
       poly
     end
 

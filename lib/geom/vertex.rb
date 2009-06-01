@@ -1,7 +1,7 @@
 require 'forwardable'
 
 module Geom
-  class Vertex3D
+  class Vertex
     attr_accessor(:position,:normal)
     extend Forwardable
     def_delegators(:@position,
@@ -23,11 +23,11 @@ module Geom
     end
 
     def clone
-      Vertex3D.new(x,y,z)
+      Vertex.new(x,y,z)
     end
 
     def to_s
-      "#<Geom::Vertex3D:#{@position.to_s}>"
+      "#<Geom::Vertex:#{@position.to_s}>"
     end
   end
 end

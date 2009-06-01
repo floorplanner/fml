@@ -1,5 +1,5 @@
 module Geom
-  class Plane3D
+  class Plane
     attr_accessor(:normal)
     def initialize(normal=nil,point=nil)
       if normal && point
@@ -12,7 +12,7 @@ module Geom
     end
 
     def self.three_points(p0,p1,p2)
-      plane = Plane3D.new
+      plane = Plane.new
       n0 = p0.instance_of?(Number3D) ? p0 : p0.position
       n1 = p1.instance_of?(Number3D) ? p1 : p1.position
       n2 = p2.instance_of?(Number3D) ? p2 : p2.position
@@ -29,7 +29,7 @@ module Geom
     end
 
     def distance(point)
-      p = point.instance_of?(Vertex3D) ? point.position : point
+      p = point.instance_of?(Vertex) ? point.position : point
       Number3D.dot(p,@normal) + @d
     end
   end

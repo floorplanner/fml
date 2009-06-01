@@ -1,5 +1,5 @@
 module Floorplanner
-  class AreaBuilder < Geom::TriangleMesh3D
+  class AreaBuilder < Geom::TriangleMesh
     def initialize(&block)
       super()
       block.call(self)
@@ -20,7 +20,7 @@ module Floorplanner
     end
 
     def area(vertices,color)
-      @meshes << Geom::Polygon3D.new(vertices,nil,color)
+      @meshes << Geom::Polygon.new(vertices,nil,color)
     end
 
     private

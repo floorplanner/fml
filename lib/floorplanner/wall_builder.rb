@@ -1,5 +1,5 @@
 module Floorplanner
-  class WallBuilder < Geom::TriangleMesh3D
+  class WallBuilder < Geom::TriangleMesh
     # TODO move to config
     SNAP = 0.01
     def initialize(&block)

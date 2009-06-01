@@ -1,5 +1,5 @@
 module Geom
-  class Triangle3D
+  class Triangle
     attr_accessor(:vertices,:normal)
     def initialize(vertices,normal=nil)
       unless vertices.length == 3
@@ -17,7 +17,7 @@ module Geom
     end
 
     def clone
-      Triangle3D.new(@vertices.collect{|v| v.clone})
+      Triangle.new(@vertices.collect{|v| v.clone})
     end
 
     private

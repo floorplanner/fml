@@ -1,16 +1,17 @@
 module Geom
-  class TriangleMesh3D
-    attr_accessor(:vertices,:faces,:meshes,:data)
+  class TriangleMesh
+    attr_accessor(:vertices,:faces,:meshes,:data,:triangulation)
     def initialize(vertices=nil,faces=nil,color="#000000")
       @meshes   = Array.new
       @vertices = vertices || Array.new
       @faces    = faces || Array.new
       @data     = Hash.new
-      @data[:color] = color # REMOVE
+      @triangulation = EarTrim
+      @data[:color]  = color # REMOVE
     end
 
     def << (mesh)
-      @meshes = mesh
+      @meshes << mesh
     end
 
     def vertices
@@ -25,6 +26,10 @@ module Geom
 
     def update
       @meshes.each {|m| m.update}
+    end
+
+    def flip_winding
+      faces.each {|f| f.vertices.reverse! }
     end
 
     def transform_vertices(transformation)

@@ -1,5 +1,5 @@
 module Floorplanner
-  class Opening3D < Geom::TriangleMesh3D
+  class Opening3D < Geom::TriangleMesh
     OPENING_LOW = 0.85
     attr_accessor(:position)
     def initialize(baseline,thickness,opening)
@@ -10,16 +10,16 @@ module Floorplanner
       width  = opening[:size].x
       height = opening[:size].y
 
-      v1 = Geom::Vertex3D.new(-width/2,0,0)
-      v2 = Geom::Vertex3D.new( width/2,0,0)
+      v1 = Geom::Vertex.new(-width/2,0,0)
+      v2 = Geom::Vertex.new( width/2,0,0)
       o_base = Geom::Edge.new(v1,v2)
       
       o_inner = o_base.offset(thickness/2.0,Wall3D::UP)
       o_outer = o_base.offset(-thickness/2.0,Wall3D::UP)
 
-      @base = Geom::Polygon3D.new([
-        o_inner.start_point, o_inner.end_point,
-        o_outer.end_point  , o_outer.start_point
+      @base = Geom::Polygon.new([
+        o_inner.end_point, o_inner.start_point,
+        o_outer.start_point  , o_outer.end_point
       ])
 
       # rotate in wall's direction
@@ -32,6 +32,9 @@ module Floorplanner
       # delete sides
       extrusion.delete_at(0)
       extrusion.delete_at(1)
+
+      # flip top cap
+      extrusion.last.vertices.reverse!
       
       @meshes << @base
       @meshes.concat(extrusion)
@@ -46,7 +49,7 @@ module Floorplanner
     #          |         |
     #        v2!____<____!v5
     #          |
-    #          ^v
+    #          v^
     #          |
     #  ..__<___!v1______<____..
     #  
@@ -54,7 +57,7 @@ module Floorplanner
       vers = poly.vertices
 
       # create loop from extrusion vertices
-      v1 = Geom::Vertex3D.new
+      v1 = Geom::Vertex.new
       v1.x = @base.vertices[outer ? 0 : 2].x
       v1.y = @base.vertices[outer ? 0 : 2].y
 
@@ -70,14 +73,14 @@ module Floorplanner
       v5 = @base.vertices[outer ? 1 : 3]
 
       # insert loop
-      offset = outer ? 0 : vers.length - 4
+      offset = outer ? vers.length - 4 : 0
       vers.insert(offset+3,v1)
-      vers.insert(offset+4,v2)
-      vers.insert(offset+5,v3)
-      vers.insert(offset+6,v4)
-      vers.insert(offset+7,v5)
-      vers.insert(offset+8,v2)
-      vers.insert(offset+9,v1)
+      # vers.insert(offset+4,v2)
+      vers.insert(offset+4,v3)
+      vers.insert(offset+5,v4)
+      vers.insert(offset+6,v5)
+      vers.insert(offset+7,v2)
+      vers.insert(offset+8,v1)
     end
   end
 end
