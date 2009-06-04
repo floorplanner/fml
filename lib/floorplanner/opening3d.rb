@@ -51,7 +51,7 @@ module Floorplanner
     #          |
     #          v^
     #          |
-    #  ..__<___!v1______<____..
+    #  ..__>___!v1______>____..
     #  
     def drill(poly,outer)
       vers = poly.vertices
@@ -75,7 +75,7 @@ module Floorplanner
       # insert loop
       offset = outer ? vers.length - 4 : 0
       vers.insert(offset+3,v1)
-      # vers.insert(offset+4,v2)
+ #     vers.insert(offset+4,v2)
       vers.insert(offset+4,v3)
       vers.insert(offset+5,v4)
       vers.insert(offset+6,v5)

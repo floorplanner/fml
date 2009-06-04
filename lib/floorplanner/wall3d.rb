@@ -62,6 +62,8 @@ module Floorplanner
       top_cap = @outline.clone
       top_cap.transform_vertices(Geom::Matrix3D.translation(0,0,@height))
       @meshes << top_cap
+      # flip bottom cap
+      @outline.reverse
 
       # create walls side polygons
       num    = @outline.vertices.length
@@ -73,14 +75,15 @@ module Floorplanner
         # omit starting and ending polygons
         next if ( starts.include?(v) && starts.include?(j) ) ||
                 ( ends.include?(v) && ends.include?(j) )
+
         edge = Geom::Edge.new(v,j)
         poly = edge.extrude(@height,UP)
-        # drill hole to side
+
+        # drill holes to side
         @openings.each do |opening|
-          opening.drill(poly,outs.include?(v))
+          # opening.drill(poly,outs.include?(v))
         end
         poly.update
-        poly.flip_winding if @openings.length > 0 && starts.include?(j) && starts.include?(j)
         @meshes << poly
       end
     end

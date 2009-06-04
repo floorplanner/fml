@@ -14,10 +14,10 @@ module Geom
 
     def update
       return false if @vertices.length < 3
-      triangles = @triangulation.triangulate(self)
+      triangles = @tess.triangulate(self)
       unless triangles
         @vertices.reverse!
-        triangles = @triangulation.triangulate(self)
+        triangles = @tess.triangulate(self)
         return false unless triangles
       end
 
@@ -111,7 +111,7 @@ module Geom
       @vertices.each_with_index do |v,i|
         vn = @vertices[(i+1)%n] # next
         if (((v.send(y) <= pt.send(y)) && (pt.send(y) < vn.send(y))) || ((vn.send(y) <= pt.send(y)) && (pt.send(y) < v.send(y)))) &&
-                (pt.send(x) < (vn.send(x) - v.send(x)) * (pt.send(y) - v.send(y)) / (vn.send(y) - v.send(y)) + v.send(x))
+            (pt.send(x) < (vn.send(x) - v.send(x)) * (pt.send(y) - v.send(y)) / (vn.send(y) - v.send(y)) + v.send(x))
           result = !result
         end
       end

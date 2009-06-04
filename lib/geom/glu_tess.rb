@@ -8,6 +8,7 @@ module Geom
 
       t = gluNewTess
       gluTessCallback(t,GLU_TESS_VERTEX,method(:vertex_callback).to_proc)
+      gluTessCallback(t,GLU_TESS_BEGIN,method(:begin_callback).to_proc)
       gluTessBeginPolygon(t,self)
       gluTessBeginContour(t)
 
@@ -23,6 +24,10 @@ module Geom
 
     def self.vertex_callback(v)
       puts v
+    end
+
+    def self.begin_callback(a)
+      puts "begin"
     end
   end
 end
