@@ -38,10 +38,10 @@ module Floorplanner
     end
 
     # call after adding walls
-    def opening(position,size)
+    def opening(position,size,type)
       @walls.each do |wall|
         if wall.outline.point_inside(position)
-          wall.opening(position,size)
+          wall.opening(position,size,type)
         end
       end
     end
@@ -118,6 +118,7 @@ module Floorplanner
         @vertices.concat(wall.vertices)
         @faces.concat(wall.faces)
       end
+      $stderr << "Vertices before: "+@vertices.length.to_s+"\n"
       # remove same instances
       @vertices.uniq!
       # remove same vertexes

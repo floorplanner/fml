@@ -15,8 +15,8 @@ module Floorplanner
       @openings = Array.new
     end
 
-    def opening(position,size)
-      @openings << {:position => position, :size => size}
+    def opening(position,size,type)
+      @openings << {:position => position, :size => size, :type => type}
     end
 
     # create base 'outline' polygon of wall
@@ -78,13 +78,15 @@ module Floorplanner
 
         edge = Geom::Edge.new(v,j)
         poly = edge.extrude(@height,UP)
+        mesh = Geom::TriangleMesh.new
+        mesh << poly
 
         # drill holes to side
         @openings.each do |opening|
-          # opening.drill(poly,outs.include?(v))
+          opening.drill(mesh,outs.include?(v))
         end
-        poly.update
-        @meshes << poly
+        mesh.update
+        @meshes << mesh
       end
     end
   end

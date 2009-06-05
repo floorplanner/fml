@@ -6,6 +6,7 @@ module Floorplanner
     OPENINGS_QUERY = lambda {|id| DESIGN_QUERY.call(id)+"/objects/object[type='opening']"}
     AREAS_QUERY    = lambda {|id| DESIGN_QUERY.call(id)+"/areas/area"}
     NAME_QUERY     = lambda {|id| DESIGN_QUERY.call(id)+"/name"}
+    ASSETS_QUERY   = lambda {|id,a_id| DESIGN_QUERY.call(id)+"/assets/asset[@id='#{a_id}']"}
 
     def initialize(fml,id)
       @name   = fml.find(NAME_QUERY.call(id)).first.content
@@ -44,7 +45,11 @@ module Floorplanner
         size_floats = opening.find('size').first.get_floats
         position = Geom::Number3D.new(*pos_floats)
         size     = Geom::Number3D.new(*size_floats)
-        @walls.opening(position,size)
+        
+        asset_id = opening.find('asset').first.attributes['refid']
+        asset    = fml.find(ASSETS_QUERY.call(id,asset_id)).first
+        type     = asset.find('url2d').first.content.match(/door/i) ? Opening3D::TYPE_DOOR : Opening3D::TYPE_WINDOW
+        @walls.opening(position,size,type)
       end
       @walls.update
     end
@@ -86,6 +91,8 @@ module Floorplanner
     end
 
     def to_obj
+      $stderr << "Vertices: "+@walls.vertices.length.to_s
+      $stderr << "\nFaces   : "+@walls.faces.length.to_s
       template = ERB.new(
         File.read(
           File.join(Floorplanner.config['views_path'],'design.obj.erb')))

@@ -1,14 +1,28 @@
 module Floorplanner
   class Opening3D < Geom::TriangleMesh
-    OPENING_LOW = 0.85
+
+    OPENING_LOW = 0.65
+    TYPE_DOOR   = 1
+    TYPE_WINDOW = 2
+
+    DOOR_HEIGHT   = 2.2
+    WINDOW_HEIGHT = 1.6
+
     attr_accessor(:position)
+
     def initialize(baseline,thickness,opening)
       super()
       @position = baseline.snap(opening[:position])
+      @type     = opening[:type]
       dir = baseline.direction
       angle  = Math.atan2(dir.y,dir.x)
       width  = opening[:size].x
-      height = opening[:size].y
+      height = (@type == TYPE_WINDOW ? WINDOW_HEIGHT : DOOR_HEIGHT) # opening[:size].y
+      if @type == TYPE_DOOR
+        @position.z = 0
+      else
+        @position.z = OPENING_LOW
+      end
 
       v1 = Geom::Vertex.new(-width/2,0,0)
       v2 = Geom::Vertex.new( width/2,0,0)
@@ -25,7 +39,7 @@ module Floorplanner
       # rotate in wall's direction
       @base.transform_vertices(Geom::Matrix3D.rotationZ(angle))
       # move to position
-      @base.transform_vertices(Geom::Matrix3D.translation(@position.x,@position.y,@position.z+OPENING_LOW))
+      @base.transform_vertices(Geom::Matrix3D.translation(@position.x,@position.y,@position.z))
 
       extrusion = @base.extrude(height,Wall3D::UP,nil,false)
 
@@ -34,53 +48,66 @@ module Floorplanner
       extrusion.delete_at(1)
 
       # flip top cap
-      extrusion.last.vertices.reverse!
+      extrusion.last.reverse
       
       @meshes << @base
       @meshes.concat(extrusion)
     end
 
-    # drill hole to sides by making 'loop' inside
-    # Wall3D's side polygons
-    #  
-    #        v3.____>____.v4
-    #          |         |
-    #          ^    ~    v
-    #          |         |
-    #        v2!____<____!v5
-    #          |
-    #          v^
-    #          |
-    #  ..__>___!v1______>____..
-    #  
-    def drill(poly,outer)
-      vers = poly.vertices
+    # drill hole to sides
+    def drill(mesh,outer)
+      side = outer ? mesh.meshes.first : mesh.meshes.last
 
-      # create loop from extrusion vertices
-      v1 = Geom::Vertex.new
-      v1.x = @base.vertices[outer ? 0 : 2].x
-      v1.y = @base.vertices[outer ? 0 : 2].y
+      # opening start
+      t1   = @meshes.first.vertices[outer ? 0 : 3].clone
+      t1.z = side.vertices[0].z
+      t1b  = @meshes.last.vertices[outer ? 0 : 3]
 
-      v2 = @base.vertices[outer ? 0 : 2]
-      v3,v4 = nil,nil
+      b1   = @meshes.first.vertices[outer ? 0 : 3].clone
+      b1.z = side.vertices[2].z
+      b1t  = @meshes.first.vertices[outer ? 0 : 3]
+
+      # opening end
+      t2   = @meshes.first.vertices[outer ? 1 : 2].clone
+      t2.z = side.vertices[0].z
+      t2b  = @meshes.last.vertices[outer ? 1 : 2]
+
+      b2   = @meshes.first.vertices[outer ? 1 : 2].clone
+      b2.z = side.vertices[2].z
+      b2t  = @meshes.first.vertices[outer ? 1 : 2]
+
+      # old side vertices
+      ot = side.vertices[1]
+      ob = side.vertices[2]
+      side.vertices[1] = outer ? t2 : t1
+      side.vertices[2] = outer ? b2 : b1
+
+      # polygon above opening
+      op_top = Geom::Polygon.new
       if outer
-        v3 = @meshes[2].vertices[outer ? 1 : 0]
-        v4 = @meshes[1].vertices[outer ? 0 : 1]
+        op_top.vertices.push(t2,t1,t1b,t2b)
       else
-        v3 = @meshes[1].vertices[outer ? 0 : 1]
-        v4 = @meshes[2].vertices[outer ? 1 : 0]
+        op_top.vertices.push(t1,t2,t2b,t1b)
       end
-      v5 = @base.vertices[outer ? 1 : 3]
 
-      # insert loop
-      offset = outer ? vers.length - 4 : 0
-      vers.insert(offset+3,v1)
- #     vers.insert(offset+4,v2)
-      vers.insert(offset+4,v3)
-      vers.insert(offset+5,v4)
-      vers.insert(offset+6,v5)
-      vers.insert(offset+7,v2)
-      vers.insert(offset+8,v1)
+      # polygon below opening
+      op_bot = Geom::Polygon.new
+      if outer
+        op_bot.vertices.push(b2t,b1t,b1,b2)
+      else
+        op_bot.vertices.push(b1t,b2t,b2,b1)
+      end
+
+      rest = Geom::Polygon.new
+      if outer
+        rest.vertices.push(t1,ot,ob,b1)
+      else
+        rest.vertices.push(t2,ot,ob,b2)
+      end
+      
+      mesh.meshes.push(op_top)
+      mesh.meshes.push(op_bot)
+      mesh.meshes.push(rest)
     end
   end
 end
