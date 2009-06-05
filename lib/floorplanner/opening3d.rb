@@ -1,12 +1,8 @@
 module Floorplanner
   class Opening3D < Geom::TriangleMesh
 
-    OPENING_LOW = 0.65
     TYPE_DOOR   = 1
     TYPE_WINDOW = 2
-
-    DOOR_HEIGHT   = 2.2
-    WINDOW_HEIGHT = 1.6
 
     attr_accessor(:position)
 
@@ -17,11 +13,15 @@ module Floorplanner
       dir = baseline.direction
       angle  = Math.atan2(dir.y,dir.x)
       width  = opening[:size].x
-      height = (@type == TYPE_WINDOW ? WINDOW_HEIGHT : DOOR_HEIGHT) # opening[:size].y
-      if @type == TYPE_DOOR
+      height = 0
+
+      case @type
+      when TYPE_DOOR
         @position.z = 0
+        height = Floorplanner.config['openings']['door_height']
       else
-        @position.z = OPENING_LOW
+        @position.z = Floorplanner.config['openings']['window_base']
+        height = Floorplanner.config['openings']['window_height']
       end
 
       v1 = Geom::Vertex.new(-width/2,0,0)

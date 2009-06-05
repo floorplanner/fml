@@ -55,7 +55,27 @@ module Geom
     end
 
     def snap(point)
-      point
+      x1 = @start_point.x
+      y1 = @start_point.y
+      z1 = @start_point.z
+      x2 = @end_point.x
+      y2 = @end_point.y
+      z2 = @end_point.z
+      x3 = point.x
+      y3 = point.y
+      z3 = point.z
+      dx = x2-x1
+      dy = y2-y1
+      dz = z2-z1
+      if dx == 0 && dy == 0 && dz == 0
+        return @start_point
+      else
+        t = ((x3 - x1) * dx + (y3 - y1) * dy + (z3 - z1) * dz) / (dx**2 + dy**2 + dz**2)
+        x0 = x1 + t * dx
+        y0 = y1 + t * dy
+        z0 = z1 + t * dz
+        return Vertex.new(x0,y0,z0)
+      end
     end
 
     def clone

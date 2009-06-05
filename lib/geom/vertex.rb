@@ -29,5 +29,9 @@ module Geom
     def to_s
       "#<Geom::Vertex:#{@position.to_s}>"
     end
+
+    def to_floats
+      [x,y,z].join(' ')
+    end
   end
 end

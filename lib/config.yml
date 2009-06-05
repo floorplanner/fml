@@ -1,6 +1,10 @@
 content_server: cdn.floorplanner.com
 fml_schema: xml/fml.rng
 views_path: views
+openings:
+  window_base:   0.65
+  window_height: 1.6
+  door_height:   2.2
 svg:
   width:   1024
   height:  1024
