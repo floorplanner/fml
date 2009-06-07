@@ -46,13 +46,6 @@ module Floorplanner
       end
     end
 
-    def update_sides
-      @walls.each do |wall|
-        wall.update_sides
-        @faces.concat(wall.faces)
-      end
-    end
-
     def prepare
       @base_vertices.each do |v|
         connections = @connections[v]
@@ -118,7 +111,7 @@ module Floorplanner
         @vertices.concat(wall.vertices)
         @faces.concat(wall.faces)
       end
-      $stderr << "Vertices before: "+@vertices.length.to_s+"\n"
+      $stderr << "Walls Vertices before: #{@vertices.length.to_s}\n"
       # remove same instances
       @vertices.uniq!
       # remove same vertexes
@@ -127,6 +120,17 @@ module Floorplanner
       old.each do |v|
         @vertices.push(v) unless @vertices.include?(v)
       end
+      $stderr << "Walls Vertices: #{@vertices.length.to_s}\n"
+      $stderr << "Walls Faces   : #{@faces.length.to_s}\n"
+    end
+
+    # make use of cache
+    def vertices
+      @vertices
+    end
+
+    def faces
+      @faces
     end
 
     private

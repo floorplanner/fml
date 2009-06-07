@@ -9,38 +9,84 @@
     <unit meter="1.00" name="meter"/>
     <up_axis>Z_UP</up_axis>
   </asset>
-  <library_materials>
-    <material id="walls-mat" name="WallsMaterial">
+  <library_materials id="surrounding-materials">
+    <material id="walls-material" name="WallsMaterial">
       <instance_effect url="#walls-fx"/>
     </material>
+    <% @areas.each do |area_mesh| %>
+      <material id="area_<%= area_mesh.data[:id] %>-material">
+        <instance_effect url="#area_<%= area_mesh.data[:id] %>-fx"/>
+      </material>
+    <% end %>
   </library_materials>
-  <library_effects>
+  <library_effects id="surrounding-effects">
     <effect id="walls-fx">
       <profile_COMMON>
         <technique sid="common">
-          <phong>
-            <emission><color>0 0 0 1</color></emission>
-            <ambient><color>0 0 0 1</color></ambient>
-            <diffuse><color>0.137255 0.403922 0.870588 1</color></diffuse>
-            <specular><color>0.5 0.5 0.5 1</color></specular>
-            <shininess><float>16</float></shininess>
-            <reflective><color>0 0 0 1</color></reflective>
-            <reflectivity><float>0.5</float></reflectivity>
-            <transparent><color>0 0 0 1</color></transparent>
-            <transparency><float>1</float></transparency>
-            <index_of_refraction><float>0</float></index_of_refraction>
-          </phong>
+          <lambert>
+            <emission>
+              <color>0.20000 0.20000 0.20000 1</color>
+            </emission>
+            <ambient>
+              <color>0.40000 0.40000 0.40000 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.80000 0.80000 0.80000 1</color>
+            </diffuse>
+            <reflective>
+              <color>1.00000 1.00000 1.00000 1</color>
+            </reflective>
+            <reflectivity>
+              <float>0.0</float>
+            </reflectivity>
+            <transparent>
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>0.0</float>
+            </transparency>
+          </lambert>
         </technique>
       </profile_COMMON>
     </effect>
+    <% @areas.each do |area_mesh| %>
+      <effect id="area_<%= area_mesh.data[:id] %>-fx">
+        <profile_COMMON>
+          <technique sid="common">
+            <lambert>
+              <emission>
+                <color>0.20000 0.20000 0.20000 1</color>
+              </emission>
+              <ambient>
+                <color>0.40000 0.40000 0.40000 1</color>
+              </ambient>
+              <diffuse>
+                <color><%= area_mesh.data[:color].join(' ') %> 1</color>
+              </diffuse>
+              <reflective>
+                <color>1.00000 1.00000 1.00000 1</color>
+              </reflective>
+              <reflectivity>
+                <float>0.0</float>
+              </reflectivity>
+              <transparent>
+                <color>1 1 1 1</color>
+              </transparent>
+              <transparency>
+                <float>0.0</float>
+              </transparency>
+            </lambert>
+          </technique>
+        </profile_COMMON>
+      </effect>
+    <% end %>
   </library_effects>
-  <library_geometries>
+  <library_geometries id="surrounding-geometry">
     <geometry id="walls-geom" name="WallsGeometry">
       <mesh>
         <source id="walls-positions" name="position">
-
           <float_array id="walls-positions-array" count="<%= @walls.vertices.length*3 %>">
-            <%= @walls.vertices.collect{|v| [v.x,v.y,v.z].join(' ')}.join(' ') %>
+            <%= @walls.vertices.collect {|v| v.to_floats }.join(' ') %>
           </float_array>
 
           <technique_common>
@@ -70,7 +116,7 @@
           <input semantic="POSITION" source="#walls-positions"/>
         </vertices>
 
-        <triangles count="<%= @walls.faces.length %>">
+        <triangles count="<%= @walls.faces.length %>" material="Walls">
            <input semantic="VERTEX" source="#walls-vertices" offset="0"/>
            <p>
              <%= @walls.faces.collect{|f| f.vertices.collect{|v| @walls.vertices.index(v)}}.flatten.join(' ') %>
@@ -78,9 +124,54 @@
         </triangles>
       </mesh>
     </geometry>
+    <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
+      <geometry id="area_<%= id %>-geom" name="Area_<%= id %>-Geometry">
+        <mesh>
+          <source id="area_<%= id %>-positions" name="position">
+
+            <float_array id="area_<%= id %>-positions-array" count="<%= area_mesh.vertices.length*3 %>">
+              <%= area_mesh.vertices.collect {|v| v.to_floats }.join(' ') %>
+            </float_array>
+
+            <technique_common>
+              <accessor count="<%= area_mesh.vertices.length %>" offset="0" source="#area_<%= id %>-positions-array" stride="3">
+                <param name="X" type="float"></param>
+                <param name="Y" type="float"></param>
+                <param name="Z" type="float"></param>
+              </accessor>
+            </technique_common>
+          </source>
+          <source id="area_<%= id %>-normals" name="normal">
+
+            <float_array id="area_<%= id %>-normals-array" count="<%= area_mesh.faces.length*3 %>">
+              <%= area_mesh.faces.collect{|f| [f.normal.x,f.normal.y,f.normal.z]}.flatten.join(' ') %>
+            </float_array>
+
+            <technique_common>
+              <accessor count="<%= area_mesh.faces.length %>" offset="0" source="#area_<%= id %>-normals-array" stride="3">
+                <param name="X" type="float"></param>
+                <param name="Y" type="float"></param>
+                <param name="Z" type="float"></param>
+              </accessor>
+            </technique_common>
+          </source>
+
+          <vertices id="area_<%= id %>-vertices">
+            <input semantic="POSITION" source="#area_<%= id %>-positions"/>
+          </vertices>
+
+          <triangles count="<%= area_mesh.faces.length %>" material="Area_<%= id %>">
+            <input semantic="VERTEX" source="#area_<%= id %>-vertices" offset="0"/>
+             <p>
+               <%= area_mesh.faces.collect{|f| f.vertices.collect{|v| area_mesh.vertices.index(v)}}.flatten.join(' ') %>
+             </p>
+          </triangles>
+        </mesh>
+      </geometry>
+    <% end %>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="untitled">
+    <visual_scene id="VisualSceneNode" name="<%= @name %>">
       <node id="Walls" name="Walls">
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
@@ -88,10 +179,26 @@
         <instance_geometry url="#walls-geom">
           <bind_material>
             <technique_common>
-              <instance_material symbol="BlueSG" target="#walls-mat"/>
+              <instance_material symbol="Walls" target="#walls-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
+        </node>
+      <node id="Areas" name="Areas">
+        <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
+          <node id="Area_<%= id %>" name="Area_<%= id %>">
+            <rotate sid="rotateZ">0 0 1 0</rotate>
+            <rotate sid="rotateY">0 1 0 0</rotate>
+            <rotate sid="rotateX">1 0 0 0</rotate>
+            <instance_geometry url="#area_<%= id %>-geom">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="Area_<%= id %>" target="#area_<%= id %>-material"/>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+        <% end %>
       </node>
     </visual_scene>
   </library_visual_scenes>

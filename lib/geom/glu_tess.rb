@@ -9,6 +9,7 @@ module Geom
       t = gluNewTess
       gluTessCallback(t,GLU_TESS_VERTEX,method(:vertex_callback).to_proc)
       gluTessCallback(t,GLU_TESS_BEGIN,method(:begin_callback).to_proc)
+      gluTessCallback(t,GLU_TESS_EDGE_FLAG,proc{})
       gluTessBeginPolygon(t,self)
       gluTessBeginContour(t)
 

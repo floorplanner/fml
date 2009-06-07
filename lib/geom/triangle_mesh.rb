@@ -1,13 +1,13 @@
 module Geom
   class TriangleMesh
     attr_accessor(:vertices,:faces,:meshes,:data,:tess)
-    def initialize(vertices=nil,faces=nil,color="#000000")
+    def initialize(vertices=nil,faces=nil,user_data={})
       @meshes   = Array.new
       @vertices = vertices || Array.new
       @faces    = faces || Array.new
       @data     = Hash.new
       @tess     = EarTrim
-      @data[:color]  = color # REMOVE
+      @data     = user_data
     end
 
     def << (mesh)
@@ -62,5 +62,5 @@ module Geom
         v.z = tz
       end
     end
-  end
+ end
 end

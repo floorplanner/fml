@@ -19,25 +19,20 @@ module Floorplanner
       end
     end
 
+    HEX_RE = "(?i:[a-f\\d])"
     def area(vertices,color)
-      @meshes << Geom::Polygon.new(vertices,nil,color)
+      a_id = vertices.hash.abs.to_s
+      if color =~ /\A#((?:#{HEX_RE}{2,2}){3,4})\z/
+        color = [*$1.scan(/.{2,2}/).collect {|value| value.hex / 255.0}]
+      end
+      @meshes << Geom::Polygon.new(vertices,nil,{:id => a_id, :color => color})
     end
 
     private
 
     def update
-      @meshes.each do |m|
-        m.update
-        @faces.concat(m.faces)
-        @vertices.concat(m.vertices)
-      end
-      # remove same instances
-      @vertices.uniq!
-      # remove same vertexes
-      old = @vertices.dup
-      @vertices = Array.new
-      old.each do |v|
-        @vertices.push(v) unless @vertices.include?(v)
+      @meshes.each do |mesh|
+        mesh.update
       end
     end
   end

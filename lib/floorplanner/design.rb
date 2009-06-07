@@ -10,7 +10,7 @@ module Floorplanner
 
     def initialize(fml,id)
       @name   = fml.find(NAME_QUERY.call(id)).first.content
-      @author = "John Doe" # TODO from <author> element once included in FML
+      @author = "John Doe" # TODO from <author> element if included in FML
       @areas = AreaBuilder.new do |b|
         fml.find(AREAS_QUERY.call(id)).each do |area|
           color  = area.find('color').first.content
@@ -55,6 +55,8 @@ module Floorplanner
     end
 
     def to_dae
+      @walls.reverse
+      @areas.each {|a| a.reverse}
       template = ERB.new(
         File.read(
           File.join(Floorplanner.config['views_path'],'design.dae.erb')))
@@ -91,8 +93,6 @@ module Floorplanner
     end
 
     def to_obj
-      $stderr << "Vertices: "+@walls.vertices.length.to_s
-      $stderr << "\nFaces   : "+@walls.faces.length.to_s
       template = ERB.new(
         File.read(
           File.join(Floorplanner.config['views_path'],'design.obj.erb')))
