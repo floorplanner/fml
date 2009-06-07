@@ -1,7 +1,6 @@
 module Floorplanner
   class WallBuilder < Geom::TriangleMesh
-    # TODO move to config
-    SNAP = 0.01
+    SNAP = 
     def initialize(&block)
       super()
       @connections = Hash.new
@@ -114,7 +113,7 @@ module Floorplanner
       $stderr << "Walls Vertices before: #{@vertices.length.to_s}\n"
       # remove same instances
       @vertices.uniq!
-      # remove same vertexes
+      # remove same vertices
       old = @vertices.dup
       @vertices = Array.new
       old.each do |v|
@@ -137,10 +136,12 @@ module Floorplanner
 
     def find_wall(sp,ep)
       @walls.each do |wall|
-        if wall.baseline.start_point.equal?(sp,SNAP) && wall.baseline.end_point.equal?(ep,SNAP)
-          return wall
-        elsif wall.baseline.end_point.equal?(sp,SNAP) && wall.baseline.start_point.equal?(ep,SNAP)
-          return wall
+        if wall.baseline.start_point.equal?(sp,Floorplanner.config['geom_snap']) &&
+          wall.baseline.end_point.equal?(ep,Floorplanner.config['geom_snap'])
+            return wall
+        elsif wall.baseline.end_point.equal?(sp,Floorplanner.config['geom_snap']) &&
+          wall.baseline.start_point.equal?(ep,Floorplanner.config['geom_snap'])
+            return wall
         end
       end
       nil
@@ -148,7 +149,7 @@ module Floorplanner
 
     def find_vertex(v)
       @base_vertices.each do |vertex|
-        if v.equal?(vertex,SNAP)
+        if v.equal?(vertex,Floorplanner.config['geom_snap'])
           return vertex
         end
       end

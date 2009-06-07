@@ -8,11 +8,16 @@ module Floorplanner
     NAME_QUERY     = lambda {|id| DESIGN_QUERY.call(id)+"/name"}
     ASSETS_QUERY   = lambda {|id,a_id| DESIGN_QUERY.call(id)+"/assets/asset[@id='#{a_id}']"}
 
-    def initialize(fml,id)
-      @name   = fml.find(NAME_QUERY.call(id)).first.content
+    def initialize(fml,design_id)
+      @name   = fml.find(NAME_QUERY.call(design_id)).first.content
       @author = "John Doe" # TODO from <author> element if included in FML
+      @xml    = fml
+      @design_id = design_id
+    end
+
+    def build_geometries
       @areas = AreaBuilder.new do |b|
-        fml.find(AREAS_QUERY.call(id)).each do |area|
+        @xml.find(AREAS_QUERY.call(@design_id)).each do |area|
           color  = area.find('color').first.content
 
           vertices = Array.new
@@ -26,7 +31,7 @@ module Floorplanner
         end
       end
       @walls  = WallBuilder.new do |b|
-        fml.find(LINES_QUERY.call(id)).each do |line|
+        @xml.find(LINES_QUERY.call(@design_id)).each do |line|
           floats = line.find('points').first.get_floats
           
           thickness = line.find('thickness').first.content.to_f
@@ -40,14 +45,14 @@ module Floorplanner
         end
       end
       @walls.prepare
-      fml.find(OPENINGS_QUERY.call(id)).each do |opening|
+      @xml.find(OPENINGS_QUERY.call(@design_id)).each do |opening|
         pos_floats  = opening.find('points').first.get_floats
         size_floats = opening.find('size').first.get_floats
         position = Geom::Number3D.new(*pos_floats)
         size     = Geom::Number3D.new(*size_floats)
         
         asset_id = opening.find('asset').first.attributes['refid']
-        asset    = fml.find(ASSETS_QUERY.call(id,asset_id)).first
+        asset    = @xml.find(ASSETS_QUERY.call(@design_id,asset_id)).first
         type     = asset.find('url2d').first.content.match(/door/i) ? Opening3D::TYPE_DOOR : Opening3D::TYPE_WINDOW
         @walls.opening(position,size,type)
       end
