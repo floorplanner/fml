@@ -17,7 +17,7 @@ module Floorplanner
 
       case @type
       when TYPE_DOOR
-        @position.z = 0
+        @position.z = 0.01
         height = Floorplanner.config['openings']['door_height']
       else
         @position.z = Floorplanner.config['openings']['window_base']

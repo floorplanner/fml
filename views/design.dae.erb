@@ -9,6 +9,15 @@
     <unit meter="1.00" name="meter"/>
     <up_axis>Z_UP</up_axis>
   </asset>
+  <library_lights>
+    <light id="sun">
+      <technique_common>
+        <directional>
+          <color>1 1 1</color>
+        </directional>
+      </technique_common>
+    </light>
+  </library_lights>
   <library_materials id="surrounding-materials">
     <material id="walls-material" name="WallsMaterial">
       <instance_effect url="#walls-fx"/>
@@ -22,19 +31,25 @@
   <library_effects id="surrounding-effects">
     <effect id="walls-fx">
       <profile_COMMON>
-        <technique sid="common">
-          <lambert>
+        <technique sid="blender">
+          <phong>
             <emission>
-              <color>0.20000 0.20000 0.20000 1</color>
+              <color>0.05 0.05 0.05 1</color>
             </emission>
             <ambient>
-              <color>0.40000 0.40000 0.40000 1</color>
+              <color>0.15 0.15 0.15 1</color>
             </ambient>
             <diffuse>
-              <color>0.80000 0.80000 0.80000 1</color>
+              <color>0.9 0.9 0.9 1</color>
             </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>0.0</float>
+            </shininess>
             <reflective>
-              <color>1.00000 1.00000 1.00000 1</color>
+              <color>1 1 1 1</color>
             </reflective>
             <reflectivity>
               <float>0.0</float>
@@ -45,26 +60,32 @@
             <transparency>
               <float>0.0</float>
             </transparency>
-          </lambert>
+          </phong>
         </technique>
       </profile_COMMON>
     </effect>
     <% @areas.each do |area_mesh| %>
       <effect id="area_<%= area_mesh.data[:id] %>-fx">
         <profile_COMMON>
-          <technique sid="common">
-            <lambert>
+          <technique sid="blender">
+            <phong>
               <emission>
-                <color>0.20000 0.20000 0.20000 1</color>
+                <color>0.05 0.05 0.05 1</color>
               </emission>
               <ambient>
-                <color>0.40000 0.40000 0.40000 1</color>
+                <color>0.1 0.1 0.1 1</color>
               </ambient>
               <diffuse>
                 <color><%= area_mesh.data[:color].join(' ') %> 1</color>
               </diffuse>
+              <specular>
+                <color>0 0 0 1</color>
+              </specular>
+              <shininess>
+                <float>0.0</float>
+              </shininess>
               <reflective>
-                <color>1.00000 1.00000 1.00000 1</color>
+                <color>1 1 1 1</color>
               </reflective>
               <reflectivity>
                 <float>0.0</float>
@@ -75,7 +96,7 @@
               <transparency>
                 <float>0.0</float>
               </transparency>
-            </lambert>
+            </phong>
           </technique>
         </profile_COMMON>
       </effect>
@@ -172,6 +193,12 @@
   </library_geometries>
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="<%= @name %>">
+      <node id="SunLight" name="SunLight">
+        <rotate sid="rotateZ">0 0 1 -45</rotate>
+        <rotate sid="rotateY">0 1 0 0</rotate>
+        <rotate sid="rotateX">1 0 0 22.5</rotate>
+        <instance_light url="#sun"/>
+      </node>
       <node id="Walls" name="Walls">
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
