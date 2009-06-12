@@ -77,7 +77,8 @@ module Floorplanner
     end
 
     def bounding_box
-      max , min = Geom::Number3D.new , Geom::Number3D.new
+      min = Geom::Number3D.new( 1000, 1000, 1000)
+      max = Geom::Number3D.new(-1000,-1000,-1000)
 
       @xml.find(VERTICES_INPUT_QUERY).each do |input|
         arr_id = @xml.find(GEOMETRY_ACCESSOR_QUERY % input.attributes['source'][1..-1]).

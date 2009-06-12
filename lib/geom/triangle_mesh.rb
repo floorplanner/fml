@@ -62,5 +62,22 @@ module Geom
         v.z = tz
       end
     end
- end
+
+    def bounding_box
+      min = Geom::Number3D.new( 1000, 1000, 1000)
+      max = Geom::Number3D.new(-1000,-1000,-1000)
+
+      vertices.each do |v|
+        min.x = v.x if v.x < min.x
+        min.y = v.y if v.y < min.y
+        min.z = v.z if v.z < min.z
+
+        max.x = v.x if v.x > max.x
+        max.y = v.y if v.y > max.y
+        max.z = v.z if v.z > max.z
+      end
+
+      { :max => max , :min => min }
+    end
+  end
 end
