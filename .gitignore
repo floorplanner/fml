@@ -3,4 +3,5 @@
 *~
 assets/
 nbproject/
-
+cache
+.autotest

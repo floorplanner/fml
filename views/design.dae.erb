@@ -27,6 +27,11 @@
         <instance_effect url="#area_<%= area_mesh.data[:id] %>-fx"/>
       </material>
     <% end %>
+    <% @elements.each do |element| %>
+      <% element[:asset].library_materials.each do |el_materials| %>
+        <%= el_materials.to_s %>
+      <% end %>
+    <% end %>
   </library_materials>
   <library_effects id="surrounding-effects">
     <effect id="walls-fx">
@@ -100,6 +105,11 @@
           </technique>
         </profile_COMMON>
       </effect>
+    <% end %>
+    <% @elements.each do |element| %>
+      <% element[:asset].library_effects.each do |el_effects| %>
+        <%= el_effects.to_s %>
+      <% end %>
     <% end %>
   </library_effects>
   <library_geometries id="surrounding-geometry">
@@ -190,9 +200,21 @@
         </mesh>
       </geometry>
     <% end %>
+    <% @elements.each do |element| %>
+      <% element[:asset].library_geometries.each do |el_geometries| %>
+        <%= el_geometries.to_s %>
+      <% end %>
+    <% end %>
   </library_geometries>
+  <library_nodes>
+    <% @elements.each do |element| %>
+      <% element[:asset].library_nodes.each do |el_nodes| %>
+        <%= el_nodes.to_s %>
+      <% end %>
+    <% end %>
+  </library_nodes>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="<%= @name %>">
+    <visual_scene id="VisualSceneNode" name="<%= @design.name %>">
       <node id="SunLight" name="SunLight">
         <rotate sid="rotateZ">0 0 1 -45</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
@@ -210,7 +232,7 @@
             </technique_common>
           </bind_material>
         </instance_geometry>
-        </node>
+      </node>
       <node id="Areas" name="Areas">
         <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
           <node id="Area_<%= id %>" name="Area_<%= id %>">
@@ -227,6 +249,14 @@
           </node>
         <% end %>
       </node>
+      <% @elements.each do |element| %>
+        <node>
+          <%= element[:asset].visual_scene_node.to_s  %>
+          <translate><%= element[:position].to_floats %></translate>
+          <rotation><%= element[:rotation].to_floats %></rotation>
+          <scale><%= element[:scale].to_floats %></scale>
+        </node>
+      <% end %>
     </visual_scene>
   </library_visual_scenes>
   <scene>

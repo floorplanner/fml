@@ -1,5 +1,9 @@
 module Geom
   class Matrix3D < Matrix
+    def self.identity
+      super(4)
+    end
+
     def self.rotation_matrix(x,y,z,rad)
       n_cos = Math.cos(rad)
       n_sin = Math.sin(rad)
@@ -66,6 +70,19 @@ module Geom
         [0,1,0,y],
         [0,0,1,z],
         [0,0,0,1]
+      ]
+    end
+
+    def self.reflection(plane)
+      a = plane.normal.x
+      b = plane.normal.y
+      c = plane.normal.z
+      
+      self[
+        [1-(2*a*a) , 0-(2*a*b) , 0-(2*a*c) , 0],
+        [0-(2*a*b) , 1-(2*b*b) , 0-(2*b*c) , 0],
+        [0-(2*a*c) , 0-(2*b*c) , 1-(2*c*c) , 0],
+        [0         , 0         , 0         , 1]
       ]
     end
 

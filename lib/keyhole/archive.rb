@@ -1,21 +1,16 @@
-require 'open-uri'
-require 'find'
-
 module Keyhole
   class Archive < Zip::ZipFile
-    
-    def initialize(url)
-      @url = url
-      super(Kernel.open(download_link).path)
-    end
+    CACHE_PATH = File.join(Floorplanner.config['asset_cache_path'],'dae')
+    FileUtils.mkdir_p(CACHE_PATH)
 
-    def dae_file
-      extract_entries
-      Find.find(to_dir) do |path|
-        if path =~ /\.dae/
-          return path
-        end
-      end
+    def dae_path
+      dae = entries.select{|e| e.name.match(/\.dae$/)}.first
+      @dae_path = File.join(
+        CACHE_PATH,
+        "asset_#{dae.hash.abs.to_s}_#{File.basename(dae.name)}"
+      )
+      dae.extract(@dae_path) unless File.exists?(@dae_path)
+      @dae_path
     end
 
     def image_files
@@ -23,29 +18,7 @@ module Keyhole
     end
 
     def destroy
-      Dir.rmdir(to_dir)
-    end
-
-    private
-    def download_link
-      "http://#{Floorplanner.config['content_server']}/assets/#{@url}"
-    end
-
-    def to_dir
-      "assets/#{File.basename(@url).gsub('.','_')}"
-    end
-
-    def extracted?
-      File.exists?(to_dir)
-    end
-
-    def extract_entries
-      return if extracted?
-      self.each do |entry|
-        f_path = File.join(to_dir, entry.name)
-        FileUtils.mkdir_p(File.dirname(f_path))
-        self.extract(entry, f_path) unless File.exist?(f_path)
-      end
+      File.unlink(@dae_path)
     end
   end
 end

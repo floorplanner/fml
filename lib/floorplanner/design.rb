@@ -1,15 +1,17 @@
 module Floorplanner
   # represents surrounding: walls, areas
   class Design
-    DESIGN_QUERY   = lambda {|id| "/project/floors/floor/designs/design[id='#{id}']"}
-    LINES_QUERY    = lambda {|id| DESIGN_QUERY.call(id)+"/lines/line"}
-    OPENINGS_QUERY = lambda {|id| DESIGN_QUERY.call(id)+"/objects/object[type='opening']"}
-    AREAS_QUERY    = lambda {|id| DESIGN_QUERY.call(id)+"/areas/area"}
-    NAME_QUERY     = lambda {|id| DESIGN_QUERY.call(id)+"/name"}
-    ASSETS_QUERY   = lambda {|id,a_id| DESIGN_QUERY.call(id)+"/assets/asset[@id='#{a_id}']"}
+    DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
+    LINES_QUERY    = DESIGN_QUERY+"/lines/line"
+    OPENINGS_QUERY = DESIGN_QUERY+"/objects/object[type='opening']"
+    AREAS_QUERY    = DESIGN_QUERY+"/areas/area"
+    NAME_QUERY     = DESIGN_QUERY+"/name"
+    ASSETS_QUERY   = DESIGN_QUERY+"/assets/asset[@id='%s']"
+
+    attr_accessor(:walls,:areas,:name)
 
     def initialize(fml,design_id)
-      @name   = fml.find(NAME_QUERY.call(design_id)).first.content
+      @name   = fml.find(NAME_QUERY % design_id).first.content
       @author = "John Doe" # TODO from <author> element if included in FML
       @xml    = fml
       @design_id = design_id
@@ -17,7 +19,7 @@ module Floorplanner
 
     def build_geometries
       @areas = AreaBuilder.new do |b|
-        @xml.find(AREAS_QUERY.call(@design_id)).each do |area|
+        @xml.find(AREAS_QUERY % @design_id).each do |area|
           color  = area.find('color').first.content
 
           vertices = Array.new
@@ -31,7 +33,7 @@ module Floorplanner
         end
       end
       @walls  = WallBuilder.new do |b|
-        @xml.find(LINES_QUERY.call(@design_id)).each do |line|
+        @xml.find(LINES_QUERY % @design_id).each do |line|
           floats = line.find('points').first.get_floats
           
           thickness = line.find('thickness').first.content.to_f
@@ -45,27 +47,18 @@ module Floorplanner
         end
       end
       @walls.prepare
-      @xml.find(OPENINGS_QUERY.call(@design_id)).each do |opening|
+      @xml.find(OPENINGS_QUERY % @design_id).each do |opening|
         pos_floats  = opening.find('points').first.get_floats
         size_floats = opening.find('size').first.get_floats
         position = Geom::Number3D.new(*pos_floats)
         size     = Geom::Number3D.new(*size_floats)
         
         asset_id = opening.find('asset').first.attributes['refid']
-        asset    = @xml.find(ASSETS_QUERY.call(@design_id,asset_id)).first
+        asset    = @xml.find(ASSETS_QUERY % [@design_id,asset_id]).first
         type     = asset.find('url2d').first.content.match(/door/i) ? Opening3D::TYPE_DOOR : Opening3D::TYPE_WINDOW
         @walls.opening(position,size,type)
       end
       @walls.update
-    end
-
-    def to_dae
-      @walls.reverse
-      @areas.each {|a| a.reverse}
-      template = ERB.new(
-        File.read(
-          File.join(Floorplanner.config['views_path'],'design.dae.erb')))
-      template.result(binding)
     end
 
     def to_svg
@@ -102,11 +95,6 @@ module Floorplanner
         File.read(
           File.join(Floorplanner.config['views_path'],'design.obj.erb')))
       template.result(binding)
-    end
-
-    def display_gl
-      d = Geom::DisplayGL.new(@walls,"Floorplanner Design")
-      d.display
     end
   end
 end

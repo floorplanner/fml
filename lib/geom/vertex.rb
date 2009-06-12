@@ -6,7 +6,7 @@ module Geom
     extend Forwardable
     def_delegators(:@position,
       :x, :y, :z, :x=, :y=, :z=,
-      :distance_x, :distance_y, :distance_z, :distance)
+      :distance_x, :distance_y, :distance_z, :distance, :to_floats)
     def initialize(x=0.0,y=0.0,z=0.0,normal=nil)
       @position = Number3D.new(x,y,z)
       @normal = normal
@@ -28,10 +28,6 @@ module Geom
 
     def to_s
       "#<Geom::Vertex:#{@position.to_s}>"
-    end
-
-    def to_floats
-      [x,y,z].join(' ')
     end
   end
 end

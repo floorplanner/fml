@@ -51,15 +51,15 @@ module Geom
     end
 
     def distance_x(other)
-      @x - other.x
+      (@x - other.x).abs
     end
     
     def distance_y(other)
-      @y - other.y
+      (@y - other.y).abs
     end
     
     def distance_z(other)
-      @z - other.z
+      (@z - other.z).abs
     end
     
     def distance(other)
@@ -77,6 +77,10 @@ module Geom
 
     def to_s
       "#<Geom::Number3D:#{@x},#{@y},#{@z}>"
+    end
+
+    def to_floats
+      [@x,@y,@z].join ' '
     end
   end
 end

@@ -14,24 +14,21 @@ end
 
 Then /^it should return COLLADA document as String$/ do
   @doc.class.should == String
-  @dox = XML::Document.string(@doc)
-
-  # for XPath to work
-  @dox.root.namespaces.default_prefix = "dae"
+  @dox = XML::Document.string(@doc.gsub(/xmlns=".+"/, ''))
 end
 
 Then /^the document should contain Walls$/ do
-  @dox.find("//dae:geometry[@id='walls-geom']").length.should > 0
-  @dox.find("//dae:node[@id='Walls']").length.should > 0
+  @dox.find("//geometry[@id='walls-geom']").length.should > 0
+  @dox.find("//node[@id='Walls']").length.should > 0
 end
 
 Then /^the document should contain same count of Areas$/ do
-  @dox.find("//dae:node[@id='Areas']/dae:node").length.should ==
+  @dox.find("//node[@id='Areas']/node").length.should ==
     @fml.find("//design[id='#{@design_id}']/areas/area").length
 end
 
 Then /^the document should contain sun$/ do
-  @dox.find("//dae:light[@id='sun']").length.should == 1
+  @dox.find("//light[@id='sun']").length.should == 1
 end
 
 Then /^the document should be valid$/ do
