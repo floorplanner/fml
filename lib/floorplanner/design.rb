@@ -7,8 +7,8 @@ module Floorplanner
     AREAS_QUERY    = DESIGN_QUERY+"/areas/area"
     NAME_QUERY     = DESIGN_QUERY+"/name"
 
-    include ColladaExporter
-    include SvgExporter
+    include ColladaExport
+    include SvgExport
 
     def initialize(fml,design_id)
       @name   = fml.find(NAME_QUERY % design_id).first.content

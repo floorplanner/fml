@@ -1,5 +1,5 @@
 module Floorplanner
-  module ColladaExporter
+  module ColladaExport
     DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
     ASSET_QUERY    = DESIGN_QUERY+"/assets/asset[@id='%s']"
     ASSETS_QUERY   = DESIGN_QUERY+"/assets/asset"

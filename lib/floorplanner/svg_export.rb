@@ -1,5 +1,5 @@
 module Floorplanner
-  module SvgExporter
+  module SvgExport
     def to_svg
       # translate to x:0,y:0
       bbox = @walls.bounding_box

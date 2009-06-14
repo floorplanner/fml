@@ -153,6 +153,7 @@ module Floorplanner
 
     def namespace!(node)
       node['id'] = "#{@name}_#{node['id']}" if node['id']
+      node['sid'] = "#{@name}_#{node['sid']}" if node['sid'] && node['sid'] != 'COMMON'
       node['name'] = "#{@name}_#{node['name']}" if node['name']
       node['symbol'] = "#{@name}_#{node['symbol']}" if node['symbol']
       node['material'] = "#{@name}_#{node['material']}" if node['material']
@@ -161,6 +162,17 @@ module Floorplanner
       node['url'] = "##{@name}_#{node['url'].gsub('#','')}" if node['url']
       node['target'] = "##{@name}_#{node['target'].gsub('#','')}" if node['target']
       node['source'] = "##{@name}_#{node['source'].gsub('#','')}" if node['source']
+      node['texture'] = "#{@name}_#{node['texture'].gsub('#','')}" if node['texture']
+
+      if node.name == 'surface'
+        n = node.find('init_from').first
+        n.content = "#{@name}_#{n.content}"
+      end
+
+      if node.name == 'sampler2D'
+        n = node.find('source').first
+        n.content = "#{@name}_#{n.content}"
+      end
 
       node.children.each do |children|
         namespace!(children)
