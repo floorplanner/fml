@@ -6,5 +6,5 @@ if ARGV.length < 2
   puts "\n  Usage: fml2dae.rb design_id path/to/fml" 
 else
   doc = Floorplanner::Document.new(ARGV[1])
-  puts doc.to_dae(ARGV[0])
+  doc.to_dae(ARGV[0],ARGV[2])
 end

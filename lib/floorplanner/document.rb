@@ -18,10 +18,13 @@ module Floorplanner
       end
     end
 
-    def to_dae(design_id)
+    def to_dae(design_id,out_path)
       @design = Design.new(@xml,design_id)
       @design.build_geometries
-      @design.to_dae
+      @design.save_textures File.dirname(out_path)
+      dae = File.new(out_path,'w')
+      dae.write @design.to_dae
+      dae.close
     end
 
     private

@@ -112,6 +112,13 @@
       <% end %>
     <% end %>
   </library_effects>
+  <library_images>
+    <% @assets.each_value do |asset| %>
+      <% asset.library_images.each do |image| %>
+        <%= image.to_s %>
+      <% end %>
+    <% end %>
+  </library_images>
   <library_geometries id="surrounding-geometry">
     <geometry id="walls-geom" name="WallsGeometry">
       <mesh>

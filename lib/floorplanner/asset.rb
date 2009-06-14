@@ -4,6 +4,7 @@ module Floorplanner
     LIBRARY_EFFECTS      = '/COLLADA/library_effects/effect'
     LIBRARY_MATERIALS    = '/COLLADA/library_materials/material'
     LIBRARY_NODES        = '/COLLADA/library_nodes/node'
+    LIBRARY_IMAGES       = '/COLLADA/library_images/image'
     VISUAL_SCENE_QUERY   = '/COLLADA/library_visual_scenes/visual_scene/node'
     
     VERTICES_INPUT_QUERY    = '/COLLADA/library_geometries/geometry/mesh/vertices/input'
@@ -21,8 +22,8 @@ module Floorplanner
       cached_path = File.join(CACHE_PATH,asset_id)
       if File.exists?(cached_path)
         $stderr.puts("Cached asset: %s" % asset_id)
-        kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(asset_id,kmz.dae_path)
+        @kmz = Keyhole::Archive.new(cached_path)
+        Asset.new(asset_id,@kmz)
       else
         $stderr.puts("Downloading asset: %s" % asset_url)
         cached = File.new(cached_path,'w')
@@ -30,15 +31,18 @@ module Floorplanner
         cached.write(remote.read)
         cached.close
 
-        kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(asset_id,kmz.dae_path)
+        @kmz = Keyhole::Archive.new(cached_path)
+        Asset.new(asset_id,@kmz)
       end
     end
 
-    def initialize(id,fn)
-      @xml  = XML::Document.string(File.read(fn).gsub(/xmlns=".+"/, ''))
+    def initialize(id,kmz)
+      @dae_path = kmz.dae_path(id)
+      @kmz  = kmz
       @id   = id
-      @name = File.basename(fn.gsub(/\.|dae/,''))
+      @xml  = XML::Document.string(File.read(@dae_path).gsub(/xmlns=".+"/, ''))
+      @name = File.basename(@dae_path.gsub(/\.|dae/,''))
+      @images_dict = {}
     end
 
     def measurement_unit
@@ -70,6 +74,13 @@ module Floorplanner
       nodes = @xml.find(LIBRARY_NODES)
       nodes.each{|nod| namespace!(nod)}
       @nodes = nodes
+    end
+
+    def library_images
+      return @images if @images
+      images = @xml.find(LIBRARY_IMAGES)
+      images.each{|img| namespace!(img) && update_path!(img)}
+      @images = images
     end
 
     def visual_scene_node
@@ -123,6 +134,21 @@ module Floorplanner
       result
     end
 
+    def save_textures(root_path)
+      images = @xml.find(LIBRARY_IMAGES)
+      FileUtils.mkdir_p(root_path) unless images.length.zero?
+
+      images.each do |image|
+        relative_to_dae = image.find('init_from').first.content
+        img_path = @kmz.image_path(@id,relative_to_dae)
+        target_path = File.join(root_path,File.basename(img_path))
+        target = open(target_path,'w')
+        target.write(File.read(img_path))
+        target.close
+        @images_dict[relative_to_dae] = "images/#{@name}/#{File.basename(img_path)}"
+      end
+    end
+
     private
 
     def namespace!(node)
@@ -140,6 +166,13 @@ module Floorplanner
         namespace!(children)
       end
       node
+    end
+
+    # updates image path to export output folder
+    def update_path!(node)
+      init_from_node = node.find('init_from').first
+      relative = init_from_node.content
+      init_from_node.content = @images_dict[relative]
     end
   end
 end

@@ -6,6 +6,7 @@ module Floorplanner
     OBJECTS_QUERY  = DESIGN_QUERY+"/objects/object"
 
     def to_dae
+      raise "No geometries to export. Call build_geometries first" unless @areas && @walls
       @assets   = assets
       @elements = objects
 
@@ -79,6 +80,15 @@ module Floorplanner
         }
       end
       result
+    end
+
+    def save_textures(root_path)
+      img_path = File.join(root_path,'images')
+      FileUtils.mkdir_p img_path
+      assets.each_value do |asset|
+        a_dir = File.join(img_path,asset.name)
+        asset.save_textures a_dir
+      end
     end
   end
 end
