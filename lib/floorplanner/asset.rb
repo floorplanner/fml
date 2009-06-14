@@ -15,14 +15,14 @@ module Floorplanner
 
     attr_accessor :name
 
-    def self.get(id,url3d)
-      asset_url = "http://#{Floorplanner.config['content_server']}/assets/#{URI.escape(url3d)}"
+    def self.get(asset_id,asset_url3d)
+      asset_url = "http://#{Floorplanner.config['content_server']}/assets/#{URI.escape(asset_url3d)}"
       
-      cached_path = File.join(CACHE_PATH,id)
+      cached_path = File.join(CACHE_PATH,asset_id)
       if File.exists?(cached_path)
-        $stderr.puts("Cached asset: %s" % id)
+        $stderr.puts("Cached asset: %s" % asset_id)
         kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(kmz.dae_path)
+        Asset.new(asset_id,kmz.dae_path)
       else
         $stderr.puts("Downloading asset: %s" % asset_url)
         cached = File.new(cached_path,'w')
@@ -31,12 +31,13 @@ module Floorplanner
         cached.close
 
         kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(kmz.dae_path)
+        Asset.new(asset_id,kmz.dae_path)
       end
     end
 
-    def initialize(fn)
+    def initialize(id,fn)
       @xml  = XML::Document.string(File.read(fn).gsub(/xmlns=".+"/, ''))
+      @id   = id
       @name = File.basename(fn.gsub(/\.|dae/,''))
     end
 

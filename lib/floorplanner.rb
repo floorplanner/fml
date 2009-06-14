@@ -19,6 +19,8 @@ end
 require 'geom'
 require 'floorplanner/asset'
 require 'floorplanner/document'
+require 'floorplanner/collada_exporter'
+require 'floorplanner/svg_exporter'
 require 'floorplanner/design'
 require 'floorplanner/wall3d'
 require 'floorplanner/opening3d'

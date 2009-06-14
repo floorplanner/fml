@@ -19,21 +19,9 @@ module Floorplanner
     end
 
     def to_dae(design_id)
-      @design = Floorplanner::Design.new(@xml,design_id)
+      @design = Design.new(@xml,design_id)
       @design.build_geometries
-
-      @walls    = @design.walls
-      @areas    = @design.areas
-      @elements = @design.objects
-
-      # somehow...
-      @walls.reverse
-      @areas.each {|a| a.reverse}
-
-      template = ERB.new(
-        File.read(
-          File.join(Floorplanner.config['views_path'],'design.dae.erb')))
-      template.result(binding)
+      @design.to_dae
     end
 
     private

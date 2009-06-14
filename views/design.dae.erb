@@ -27,9 +27,9 @@
         <instance_effect url="#area_<%= area_mesh.data[:id] %>-fx"/>
       </material>
     <% end %>
-    <% @elements.each do |element| %>
-      <% element[:asset].library_materials.each do |el_materials| %>
-        <%= el_materials.to_s %>
+    <% @assets.each_value do |asset| %>
+      <% asset.library_materials.each do |materials| %>
+        <%= materials.to_s %>
       <% end %>
     <% end %>
   </library_materials>
@@ -106,9 +106,9 @@
         </profile_COMMON>
       </effect>
     <% end %>
-    <% @elements.each do |element| %>
-      <% element[:asset].library_effects.each do |el_effects| %>
-        <%= el_effects.to_s %>
+    <% @assets.each_value do |asset| %>
+      <% asset.library_effects.each do |effects| %>
+        <%= effects.to_s %>
       <% end %>
     <% end %>
   </library_effects>
@@ -200,21 +200,21 @@
         </mesh>
       </geometry>
     <% end %>
-    <% @elements.each do |element| %>
-      <% element[:asset].library_geometries.each do |el_geometries| %>
-        <%= el_geometries.to_s %>
+    <% @assets.each_value do |asset| %>
+      <% asset.library_geometries.each do |geometries| %>
+        <%= geometries.to_s %>
       <% end %>
     <% end %>
   </library_geometries>
   <library_nodes>
-    <% @elements.each do |element| %>
-      <% element[:asset].library_nodes.each do |el_nodes| %>
-        <%= el_nodes.to_s %>
+    <% @assets.each_value do |asset| %>
+      <% asset.library_nodes.each do |nodes| %>
+        <%= nodes.to_s %>
       <% end %>
     <% end %>
   </library_nodes>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="<%= @design.name %>">
+    <visual_scene id="VisualSceneNode" name="<%= @name %>">
       <node id="SunLight" name="SunLight">
         <rotate sid="rotateZ">0 0 1 -45</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
@@ -222,9 +222,6 @@
         <instance_light url="#sun"/>
       </node>
       <node id="Walls" name="Walls">
-        <rotate sid="rotateZ">0 0 1 0</rotate>
-        <rotate sid="rotateY">0 1 0 0</rotate>
-        <rotate sid="rotateX">1 0 0 0</rotate>
         <instance_geometry url="#walls-geom">
           <bind_material>
             <technique_common>
@@ -236,9 +233,6 @@
       <node id="Areas" name="Areas">
         <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
           <node id="Area_<%= id %>" name="Area_<%= id %>">
-            <rotate sid="rotateZ">0 0 1 0</rotate>
-            <rotate sid="rotateY">0 1 0 0</rotate>
-            <rotate sid="rotateX">1 0 0 0</rotate>
             <instance_geometry url="#area_<%= id %>-geom">
               <bind_material>
                 <technique_common>
@@ -253,7 +247,15 @@
         <node>
           <%= element[:asset].visual_scene_node.to_s  %>
           <translate><%= element[:position].to_floats %></translate>
-          <rotation><%= element[:rotation].to_floats %></rotation>
+          <% if element[:rotation].x > 0 %>
+            <rotate sid="rotateX">1 0 0 <%= element[:rotation].x %></rotate>
+          <% end %>
+          <% if element[:rotation].y > 0 %>
+            <rotate sid="rotateY">0 1 0 <%= element[:rotation].y %></rotate>
+          <% end %>
+          <% if element[:rotation].z > 0 %>
+            <rotate sid="rotateZ">0 0 1 <%= element[:rotation].z %></rotate>
+          <% end %>
           <scale><%= element[:scale].to_floats %></scale>
         </node>
       <% end %>
