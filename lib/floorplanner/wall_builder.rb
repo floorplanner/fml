@@ -110,7 +110,9 @@ module Floorplanner
         @vertices.concat(wall.vertices)
         @faces.concat(wall.faces)
       end
-      $stderr << "Walls Vertices before: #{@vertices.length.to_s}\n"
+      build_ceiling
+
+      $stderr.puts "Walls Vertices before: #{@vertices.length.to_s}"
       # remove same instances
       @vertices.uniq!
       # remove same vertices
@@ -119,8 +121,8 @@ module Floorplanner
       old.each do |v|
         @vertices.push(v) unless @vertices.include?(v)
       end
-      $stderr << "Walls Vertices: #{@vertices.length.to_s}\n"
-      $stderr << "Walls Faces   : #{@faces.length.to_s}\n"
+      $stderr.puts "Walls Vertices: #{@vertices.length.to_s}"
+      $stderr.puts "Walls Faces   : #{@faces.length.to_s}"
     end
 
     # make use of cache
@@ -154,6 +156,17 @@ module Floorplanner
         end
       end
       return nil
+    end
+
+    def build_ceiling
+      vs = @base_vertices.dup
+      p = Geom::Polygon.new(vs)
+      p.vertices.each do |v|
+        # p.vertices.delete(v) if p.point_inside(v)
+      end
+      p.update
+      @vertices.concat(p.vertices)
+      @faces.concat(p.faces)
     end
   end
 end

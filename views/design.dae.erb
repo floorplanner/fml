@@ -8,7 +8,20 @@
     <modified>2006-06-21T21:23:22Z</modified>
     <unit meter="1.00" name="meter"/>
     <up_axis>Z_UP</up_axis>
-  </asset>
+    </asset>
+  <library_cameras>
+    <camera id="main-cam">
+      <optics>
+        <technique_common>
+          <perspective>
+            <yfov>70</yfov>
+            <znear>0.1</znear>
+            <zfar>100.0</zfar>
+          </perspective>
+        </technique_common>
+      </optics>
+    </camera>
+  </library_cameras>
   <library_lights>
     <light id="sun">
       <technique_common>
@@ -221,7 +234,38 @@
     <% end %>
   </library_nodes>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="<%= @name %>">
+  <visual_scene id="VisualSceneNode" name="<%= @name %>">
+      <extra>
+        <technique sid="sunflow">
+          <image>
+            <resolution>800 600</resolution>
+            <aa>0 2</aa>
+            <filter>gaussian</filter>
+          </image>
+          <trace_depths>
+            <diffuse>4</diffuse>
+            <reflection>2</reflection>
+          </trace_depths>
+          <background>
+            <color>1.0 1.0 1.0</color>
+          </background>
+          <gi>
+            <type>ambocc</type>
+            <bright>1 1 1</bright>
+            <dark>0 0 0</dark>
+            <samples>32</samples>
+            <maxdist>3.0 </maxdist>
+          </gi>
+        </technique>
+      </extra>
+      <node id="Camera" name="Camera">
+        <lookat>
+          3.0 1.0 2.0
+          1.0 4.0 1.8
+          0.0 0.0 1.0
+        </lookat>
+        <instance_camera url="#main-cam"/>
+      </node>
       <node id="SunLight" name="SunLight">
         <rotate sid="rotateZ">0 0 1 -45</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>

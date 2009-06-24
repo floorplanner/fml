@@ -27,6 +27,22 @@ module Floorplanner
       dae.close
     end
 
+    def to_rib(design_id,out_path)
+      @design = Design.new(@xml,design_id)
+      @design.build_geometries
+      rib = File.new(out_path,'w')
+      rib.write @design.to_rib
+      rib.close
+    end
+
+    def to_obj(design_id,out_path)
+      @design = Design.new(@xml,design_id)
+      @design.build_geometries
+      obj = File.new(out_path,'w')
+      obj.write @design.to_obj
+      obj.close
+    end
+
     private
 
     def self.validate_line_points(doc)

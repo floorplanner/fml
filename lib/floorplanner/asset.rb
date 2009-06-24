@@ -10,6 +10,8 @@ module Floorplanner
     VERTICES_INPUT_QUERY    = '/COLLADA/library_geometries/geometry/mesh/vertices/input'
     GEOMETRY_ACCESSOR_QUERY = '/COLLADA/library_geometries/geometry/mesh/source[@id="%s"]/technique_common/accessor'
     VERTICES_ARRAY_QUERY    = '/COLLADA/library_geometries/geometry/mesh/source/float_array[@id="%s"]'
+    
+    NO_NS_NAME = %w{ param }
 
     CACHE_PATH = File.join(Floorplanner.config['asset_cache_path'],'kmz')
     FileUtils.mkdir_p(CACHE_PATH)
@@ -154,7 +156,7 @@ module Floorplanner
     def namespace!(node)
       node['id'] = "#{@name}_#{node['id']}" if node['id']
       node['sid'] = "#{@name}_#{node['sid']}" if node['sid'] && node['sid'] != 'COMMON'
-      node['name'] = "#{@name}_#{node['name']}" if node['name']
+      node['name'] = "#{@name}_#{node['name']}" if node['name'] && !NO_NS_NAME.include?(node.name)
       node['symbol'] = "#{@name}_#{node['symbol']}" if node['symbol']
       node['material'] = "#{@name}_#{node['material']}" if node['material']
 

@@ -2,19 +2,30 @@ module Floorplanner
   # represents surrounding: walls, areas
   class Design
     DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
+    DESIGN_N_QUERY = "/project/floors/floor/designs/design[name='%s']"
     LINES_QUERY    = DESIGN_QUERY+"/lines/line"
     OPENINGS_QUERY = DESIGN_QUERY+"/objects/object[type='opening']"
     AREAS_QUERY    = DESIGN_QUERY+"/areas/area"
     NAME_QUERY     = DESIGN_QUERY+"/name"
 
     include ColladaExport
+    include ObjExport
+    include RibExport
     include SvgExport
 
     def initialize(fml,design_id)
-      @name   = fml.find(NAME_QUERY % design_id).first.content
-      @author = "John Doe" # TODO from <author> element if included in FML
-      @xml    = fml
-      @design_id = design_id
+      begin
+        @xml = fml
+        unless fml.find(DESIGN_QUERY % design_id).length.zero?
+          @design_id = design_id
+        else
+          @design_id = fml.find(DESIGN_N_QUERY % design_id).first.find("id").first.content
+        end
+        @name   = @xml.find(NAME_QUERY % @design_id).first.content
+        @author = "John Doe" # TODO from <author> element if included in FML
+      rescue NoMethodError
+        $stderr.puts "Can't find Design with ID or name: %s" % design_id
+      end
     end
 
     def build_geometries

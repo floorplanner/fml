@@ -2,12 +2,13 @@ module Floorplanner
   class AreaBuilder < Geom::TriangleMesh
     def initialize(&block)
       super()
+      @meshes = {}
       block.call(self)
       update
     end
 
     def each(&block)
-      @meshes.each{|p| block.call(p)}
+      @meshes.each_value{|a| block.call(a)}
     end
 
     def vertex(v)
@@ -25,13 +26,13 @@ module Floorplanner
       if color =~ /\A#((?:#{HEX_RE}{2,2}){3,4})\z/
         color = [*$1.scan(/.{2,2}/).collect {|value| value.hex / 255.0}]
       end
-      @meshes << Geom::Polygon.new(vertices,nil,{:id => a_id, :color => color})
+      @meshes[a_id] = Geom::Polygon.new(vertices,nil,{:id => a_id, :color => color})
     end
 
     private
 
     def update
-      @meshes.each do |mesh|
+      @meshes.each_value do |mesh|
         mesh.update
       end
     end
