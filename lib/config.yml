@@ -1,7 +1,5 @@
-content_server: cdn.floorplanner.com
-fml_schema_path: xml/fml.rng
-asset_cache_path: cache
-views_path: views
+content_base_url: http://cdn.floorplanner.com/assets/
+dae_cache_path: /tmp/fml2dae_cache/
 
 geom_snap:  0.1
 openings:

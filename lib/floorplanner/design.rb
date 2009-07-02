@@ -29,9 +29,10 @@ module Floorplanner
     end
 
     def build_geometries
-      @areas = AreaBuilder.new do |b|
+      @areas = AreaBuilder.new 2.7 do |b|
         @xml.find(AREAS_QUERY % @design_id).each do |area|
           color  = area.find('color').first.content
+          type   = area.find('type').first.content
 
           vertices = Array.new
           area.find('points').first.content.split(',').each do |str_v|
@@ -40,7 +41,7 @@ module Floorplanner
             vertices << b.vertex(Geom::Vertex.new(*floats[3..5]))
           end
 
-          b.area(vertices,color)
+          b.area(vertices,color,type)
         end
       end
       @walls  = WallBuilder.new do |b|

@@ -1,7 +1,7 @@
 module Keyhole
   class Archive < Zip::ZipFile
-    DAE_CACHE_PATH = File.join(Floorplanner.config['asset_cache_path'],'dae')
-    IMG_CACHE_PATH = File.join(Floorplanner.config['asset_cache_path'],'textures')
+    DAE_CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'],'dae')
+    IMG_CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'],'textures')
 
     FileUtils.mkdir_p DAE_CACHE_PATH
     FileUtils.mkdir_p IMG_CACHE_PATH

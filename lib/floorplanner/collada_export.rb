@@ -16,7 +16,7 @@ module Floorplanner
 
       template = ERB.new(
         File.read(
-          File.join(Floorplanner.config['views_path'],'design.dae.erb')))
+          File.join(File.dirname(__FILE__), '..', '..', 'views', 'design.dae.erb')))
       template.result(binding)
     end
 
@@ -52,6 +52,7 @@ module Floorplanner
             '0 0 0'
           end
           rotation = Geom::Number3D.from_str(rotation)
+          rotation.z += 360 if rotation.z < 0
           rotation.z += 180
           
           # find proper scale for object

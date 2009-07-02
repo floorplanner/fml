@@ -13,13 +13,13 @@ module Floorplanner
     
     NO_NS_NAME = %w{ param }
 
-    CACHE_PATH = File.join(Floorplanner.config['asset_cache_path'],'kmz')
+    CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'kmz')
     FileUtils.mkdir_p(CACHE_PATH)
 
     attr_accessor :name
 
     def self.get(asset_id,asset_url3d)
-      asset_url = "http://#{Floorplanner.config['content_server']}/assets/#{URI.escape(asset_url3d)}"
+      asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset_url3d)
       
       cached_path = File.join(CACHE_PATH,asset_id)
       if File.exists?(cached_path)

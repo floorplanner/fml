@@ -15,6 +15,18 @@ module Floorplanner
   def self.config
     @@config ||= YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
   end
+
+  def self.config=(yaml)
+    @@config = yaml
+  end
+end
+
+module XML
+  class Node
+    def get_floats
+      content.split(/\s/).map! {|f| f.to_f}
+    end
+  end
 end
 
 require 'geom'
@@ -31,11 +43,3 @@ require 'floorplanner/wall_builder'
 require 'floorplanner/area_builder'
 require 'collada/document'
 require 'keyhole/archive'
-
-module XML
-  class Node
-    def get_floats
-      content.split(/\s/).map! {|f| f.to_f}
-    end
-  end
-end
