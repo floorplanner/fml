@@ -79,5 +79,9 @@ module Geom
 
       { :max => max , :min => min }
     end
+
+    def merge(other)
+      @vertices.concat other.vertices
+    end
   end
 end

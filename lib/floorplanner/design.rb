@@ -29,7 +29,7 @@ module Floorplanner
     end
 
     def build_geometries
-      @areas = AreaBuilder.new 2.7 do |b|
+      @areas = AreaBuilder.new do |b|
         @xml.find(AREAS_QUERY % @design_id).each do |area|
           color  = area.find('color').first.content
           type   = area.find('type').first.content
@@ -44,6 +44,7 @@ module Floorplanner
           b.area(vertices,color,type)
         end
       end
+      min_height = 10
       @walls  = WallBuilder.new do |b|
         @xml.find(LINES_QUERY % @design_id).each do |line|
           floats = line.find('points').first.get_floats
@@ -56,8 +57,10 @@ module Floorplanner
           sp = b.vertex(sp)
           ep = b.vertex(ep)
           b.wall(sp,ep,thickness,height)
+          min_height = height if height < min_height
         end
       end
+      @areas.update min_height
       @walls.prepare
       @xml.find(OPENINGS_QUERY % @design_id).each do |opening|
         pos_floats  = opening.find('points').first.get_floats

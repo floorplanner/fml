@@ -7,10 +7,6 @@ module Floorplanner
     LIBRARY_IMAGES       = '/COLLADA/library_images/image'
     VISUAL_SCENE_QUERY   = '/COLLADA/library_visual_scenes/visual_scene/node'
     
-    VERTICES_INPUT_QUERY    = '/COLLADA/library_geometries/geometry/mesh/vertices/input'
-    GEOMETRY_ACCESSOR_QUERY = '/COLLADA/library_geometries/geometry/mesh/source[@id="%s"]/technique_common/accessor'
-    VERTICES_ARRAY_QUERY    = '/COLLADA/library_geometries/geometry/mesh/source/float_array[@id="%s"]'
-    
     NO_NS_NAME = %w{ param }
 
     CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'kmz')
@@ -91,29 +87,8 @@ module Floorplanner
     end
 
     def bounding_box
-      min = Geom::Number3D.new( 1000, 1000, 1000)
-      max = Geom::Number3D.new(-1000,-1000,-1000)
-
-      @xml.find(VERTICES_INPUT_QUERY).each do |input|
-        arr_id = @xml.find(GEOMETRY_ACCESSOR_QUERY % input.attributes['source'][1..-1]).
-          first.attributes['source'][1..-1]
-        @xml.find(VERTICES_ARRAY_QUERY % arr_id).first.content.split(/\s/).each_with_index do |f,i|
-          f = f.to_f
-          case i % 3
-          when 0 # X
-            max.x = f if f > max.x
-            min.x = f if f < min.x
-          when 1 # Y
-            max.y = f if f > max.y
-            min.y = f if f < min.y
-          when 2 # Z
-            max.z = f if f > max.z
-            min.z = f if f < min.z
-          end
-        end
-      end
-
-      { :max => max , :min => min }
+      mesh = Geom::TriangleMesh.collada @xml
+      mesh.bounding_box
     end
 
     def bounding_box_size

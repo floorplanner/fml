@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.files = ["README", "bin/fml2dae.rb", "bin/fml2obj.rb", "lib/config.yml",
              "lib/floorplanner.rb", "lib/floorplanner/area_builder.rb", "lib/floorplanner/asset.rb", "lib/floorplanner/collada_export.rb", "lib/floorplanner/design.rb", "lib/floorplanner/document.rb", "lib/floorplanner/obj_export.rb", "lib/floorplanner/opening3d.rb", "lib/floorplanner/rib_export.rb", "lib/floorplanner/svg_export.rb", "lib/floorplanner/wall3d.rb", "lib/floorplanner/wall_builder.rb",
              "lib/geom.rb", "lib/geom/connection.rb", "lib/geom/ear_trim.rb", "lib/geom/edge.rb", "lib/geom/glu_tess.rb", "lib/geom/intersection.rb", "lib/geom/matrix3d.rb", "lib/geom/number3d.rb", "lib/geom/plane.rb", "lib/geom/polygon.rb", "lib/geom/triangle_mesh.rb", "lib/geom/triangle.rb", "lib/geom/vertex.rb",
-             "lib/collada/document.rb", "lib/keyhole/archive.rb",
+             "lib/collada/document.rb", "lib/collada/geometry.rb", "lib/keyhole/archive.rb",
              "views/design.dae.erb", "views/design.obj.erb", "views/design.svg.erb", "views/design.rib.erb",
              "xml/fml.rng", "xml/collada_schema_1_4.xsd"
   ]

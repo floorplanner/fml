@@ -1,10 +1,9 @@
 module Floorplanner
   class AreaBuilder < Geom::TriangleMesh
-    def initialize(ceiling_z, &block)
+    def initialize(&block)
       super()
       @meshes = {}
       block.call(self)
-      update ceiling_z
     end
 
     def each(&block)
@@ -28,8 +27,6 @@ module Floorplanner
       end
       @meshes[a_id] = Geom::Polygon.new(vertices,nil,{:id => a_id, :color => color, :type => type})
     end
-
-    private
 
     def update(ceiling_z)
       caps = {}
