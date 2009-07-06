@@ -100,6 +100,17 @@ module Geom
       ]
     end
 
+    def self.multiply_vector_3x3(m,v)
+      ma = m.to_a
+      vx = v.x
+      vy = v.y
+      vz = v.z
+
+      v.x = vx * ma[0][0] + vy * ma[0][1] + vz * ma[0][2]
+      v.y = vx * ma[1][0] + vy * ma[1][1] + vz * ma[1][2]
+      v.z = vx * ma[2][0] + vy * ma[2][1] + vz * ma[2][2]
+    end
+
     def multiply(other)
       # matrix multiplication is m[r][c] = (row[r]).(col[c])
       s = to_a
@@ -126,15 +137,5 @@ module Geom
       ]
     end
 
-    def self.multiply_vector_3x3(m,v)
-      ma = m.to_a
-      vx = v.x
-      vy = v.y
-      vz = v.z
-
-      v.x = vx * ma[0][0] + vy * ma[0][1] + vz * ma[0][2]
-      v.y = vx * ma[1][0] + vy * ma[1][1] + vz * ma[1][2]
-      v.z = vx * ma[2][0] + vy * ma[2][1] + vz * ma[2][2]
-    end
   end
 end

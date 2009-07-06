@@ -24,7 +24,7 @@ end
 module XML
   class Node
     def get_floats
-      content.split(/\s/).map! {|f| f.to_f}
+      content.split(/\s/).delete_if {|s| s.empty?}.map! {|f| f.to_f}
     end
   end
 end

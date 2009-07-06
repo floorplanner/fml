@@ -11,7 +11,6 @@ if Geom && Geom::TriangleMesh
       attr_accessor :xml
       
       def self.collada(xml)
-        @@cache ||= {}
         result = TriangleMesh.new
         result.xml = xml
 
@@ -25,14 +24,15 @@ if Geom && Geom::TriangleMesh
       end
 
       def eval_node(node,parent=nil)
+        @cache ||= {}
         parent = node.parent unless parent
         parent_matrix = Matrix3D.identity
         if parent.name == "node"
-          if @@cache.include?(parent)
-            parent_matrix = @@cache[parent]
+          if @cache.include?(parent)
+            parent_matrix = @cache[parent]
           else
             parent_matrix = get_node_matrix(parent)
-            @@cache[parent] = parent_matrix
+            @cache[parent] = parent_matrix
           end
         end
         node_matrix = get_node_matrix(node).multiply(parent_matrix)
@@ -99,10 +99,10 @@ if Geom && Geom::TriangleMesh
           when "matrix"
             f = child.get_floats
             t = Matrix3D[
-              [ f[0], f[1], f[2], f[3]],
-              [ f[4], f[5], f[6], f[7]],
-              [ f[8], f[9],f[10],f[11]],
-              [f[12],f[13],f[14],f[15]]
+              [ *f[0..3]   ],
+              [ *f[4..7]   ],
+              [ *f[8..11]  ],
+              [ *f[12..15] ]
             ]
             result = t.multiply(result)
           end
