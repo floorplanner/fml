@@ -1,4 +1,17 @@
 module Floorplanner
+  class Document
+
+    def to_dae(design_id,out_path,xrefs=false)
+      @design = Design.new(@xml,design_id)
+      @design.build_geometries
+      @design.save_textures File.dirname(out_path)
+      dae = File.new(out_path,'w')
+      dae.write @design.to_dae xrefs
+      dae.close
+    end
+
+  end
+
   module ColladaExport
     DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
     ASSET_QUERY    = DESIGN_QUERY+"/assets/asset[@id='%s']"
@@ -7,8 +20,8 @@ module Floorplanner
 
     def to_dae(xrefs=false)
       raise "No geometries to export. Call build_geometries first" unless @areas && @walls
-      @assets   = assets unless xrefs
-      @elements = objects(xrefs)
+      @assets   = assets 
+      @elements = objects
 
       # somehow...
       @walls.reverse
@@ -28,6 +41,7 @@ module Floorplanner
         url3d = asset_node.find('url3d')
         next if url3d.empty?
 
+        # TODO: store asset bounding box
         asset = Floorplanner::Asset.get(asset_id,url3d.first.content)
         next unless asset
         @assets.store(asset_id, asset)
@@ -35,7 +49,7 @@ module Floorplanner
       @assets
     end
 
-    def objects(xrefs=false)
+    def objects
       result = []
       @xml.find(OBJECTS_QUERY % @design_id).each do |object|
         begin

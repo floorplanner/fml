@@ -5,6 +5,11 @@ require 'floorplanner'
 if ARGV.length < 2
   puts "\n  Usage: fml2dae.rb design_id path/to/fml" 
 else
+  xrefs = false
+  if ARGV[0] == "-xrefs"
+    ARGV.shift
+    xrefs = true
+  end
   doc = Floorplanner::Document.new(ARGV[1])
-  doc.to_dae(ARGV[0],ARGV[2])
+  doc.to_dae(ARGV[0],ARGV[2],xrefs)
 end

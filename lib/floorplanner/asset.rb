@@ -12,7 +12,7 @@ module Floorplanner
     CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'kmz')
     FileUtils.mkdir_p(CACHE_PATH)
 
-    attr_accessor :name
+    attr_reader :id, :name, :dae_path
 
     def self.get(asset_id,asset_url3d)
       asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset_url3d)
