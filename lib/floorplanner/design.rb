@@ -1,5 +1,4 @@
 module Floorplanner
-  # represents surrounding: walls, areas
   class Design
     DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
     DESIGN_N_QUERY = "/project/floors/floor/designs/design[name='%s']"
@@ -13,6 +12,9 @@ module Floorplanner
     include RibExport
     include SvgExport
 
+    ##
+    # Constructs new floorplan design from FML
+    ##
     def initialize(fml,design_id)
       begin
         @xml = fml
@@ -28,6 +30,9 @@ module Floorplanner
       end
     end
 
+    ##
+    # Builds geometries of walls and areas.
+    ##
     def build_geometries
       @areas = AreaBuilder.new do |b|
         @xml.find(AREAS_QUERY % @design_id).each do |area|
@@ -37,6 +42,10 @@ module Floorplanner
           vertices = Array.new
           area.find('points').first.content.split(',').each do |str_v|
             floats = str_v.strip.split(/\s/).map! {|f| f.to_f}
+
+            # TODO: fix this in Flash app
+            floats[1] *= -1.0; floats[4] *= -1.0
+
             vertices << b.vertex(Geom::Vertex.new(*floats[0..2]))
             vertices << b.vertex(Geom::Vertex.new(*floats[3..5]))
           end
@@ -52,6 +61,9 @@ module Floorplanner
           thickness = line.find('thickness').first.content.to_f
           height = line.find('height').first.content.to_f
 
+          # TODO: fix this in Flash app
+          floats[1] *= -1.0; floats[4] *= -1.0
+
           sp = Geom::Vertex.new(*floats[0..2])
           ep = Geom::Vertex.new(*floats[3..5])
           sp = b.vertex(sp)
@@ -64,6 +76,9 @@ module Floorplanner
       @walls.prepare
       @xml.find(OPENINGS_QUERY % @design_id).each do |opening|
         pos_floats  = opening.find('points').first.get_floats
+        # TODO: fix this in Flash app
+        pos_floats[1] *= -1
+
         size_floats = opening.find('size').first.get_floats
         position = Geom::Number3D.new(*pos_floats)
         size     = Geom::Number3D.new(*size_floats)

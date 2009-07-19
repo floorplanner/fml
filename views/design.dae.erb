@@ -22,15 +22,6 @@
       </optics>
     </camera>
   </library_cameras>
-  <library_lights>
-    <light id="sun">
-      <technique_common>
-        <directional>
-          <color>1 1 1</color>
-        </directional>
-      </technique_common>
-    </light>
-  </library_lights>
   <library_materials id="surrounding-materials">
     <material id="walls-material" name="WallsMaterial">
       <instance_effect url="#walls-fx"/>
@@ -238,39 +229,37 @@
       <extra>
         <technique sid="sunflow">
           <image>
-            <resolution>800 600</resolution>
+            <resolution>160 120</resolution>
             <aa>0 2</aa>
             <filter>gaussian</filter>
+            <sampler>ipr</sampler>
           </image>
           <trace_depths>
             <diffuse>4</diffuse>
             <reflection>2</reflection>
           </trace_depths>
-          <background>
-            <color>1.0 1.0 1.0</color>
-          </background>
           <gi>
             <type>ambocc</type>
             <bright>1 1 1</bright>
             <dark>0 0 0</dark>
-            <samples>32</samples>
+            <samples>128</samples>
             <maxdist>3.0 </maxdist>
           </gi>
+          <sunsky>
+            <up>0 0 1</up>
+            <east>1 0 0</east>
+            <sundir>0.2 0.4 0.7</sundir>
+            <ground>1 1 1</ground>
+          </sunsky>
         </technique>
       </extra>
       <node id="Camera" name="Camera">
         <lookat>
-          3.0 1.0 2.0
-          1.0 4.0 1.8
+          5.0 9.0 2.0
+          6.0 8.0 1.8
           0.0 0.0 1.0
         </lookat>
         <instance_camera url="#main-cam"/>
-      </node>
-      <node id="SunLight" name="SunLight">
-        <rotate sid="rotateZ">0 0 1 -45</rotate>
-        <rotate sid="rotateY">0 1 0 0</rotate>
-        <rotate sid="rotateX">1 0 0 22.5</rotate>
-        <instance_light url="#sun"/>
       </node>
       <node id="Walls" name="Walls">
         <instance_geometry url="#walls-geom">
@@ -296,8 +285,10 @@
       </node>
       <% @elements.each do |element| %>
         <node>
-          <%= element[:asset].visual_scene_node.to_s  %>
           <translate><%= element[:position].to_floats %></translate>
+          <% if element[:matrix] %>
+            <matrix><%= element[:matrix].to_a.join ' ' %></matrix>
+          <% end %>
           <% if element[:rotation].x > 0 %>
             <rotate sid="rotateX">1 0 0 <%= element[:rotation].x %></rotate>
           <% end %>
@@ -308,6 +299,7 @@
             <rotate sid="rotateZ">0 0 1 <%= element[:rotation].z %></rotate>
           <% end %>
           <scale><%= element[:scale].to_floats %></scale>
+          <%= element[:asset].visual_scene_node.to_s  %>
         </node>
       <% end %>
     </visual_scene>

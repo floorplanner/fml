@@ -87,7 +87,7 @@ module Floorplanner
     end
 
     def bounding_box
-      mesh = Geom::TriangleMesh.collada @xml
+      mesh = Collada::Geometry.doc @xml
       mesh.bounding_box
     end
 
@@ -106,7 +106,7 @@ module Floorplanner
 
       result.x = target_size.x / bbox_size.x
       result.y = target_size.y / bbox_size.y
-      result.z = (result.x + result.y) / 2.0 # TODO: correct Z size in FML
+      result.z = 0.01 # (result.x + result.y) / 2.0 # TODO: correct Z size in FML
 
       result
     end

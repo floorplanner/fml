@@ -5,10 +5,10 @@ module Floorplanner
     ASSETS_QUERY   = DESIGN_QUERY+"/assets/asset"
     OBJECTS_QUERY  = DESIGN_QUERY+"/objects/object"
 
-    def to_dae
+    def to_dae(xrefs=false)
       raise "No geometries to export. Call build_geometries first" unless @areas && @walls
-      @assets   = assets
-      @elements = objects
+      @assets   = assets unless xrefs
+      @elements = objects(xrefs)
 
       # somehow...
       @walls.reverse
@@ -16,7 +16,7 @@ module Floorplanner
 
       template = ERB.new(
         File.read(
-          File.join(File.dirname(__FILE__), '..', '..', 'views', 'design.dae.erb')))
+          File.join(File.dirname(__FILE__), '..', '..', 'views', 'design'+(xrefs ? '_xrefs' : '')+'.dae.erb')))
       template.result(binding)
     end
 
@@ -35,7 +35,7 @@ module Floorplanner
       @assets
     end
 
-    def objects
+    def objects(xrefs=false)
       result = []
       @xml.find(OBJECTS_QUERY % @design_id).each do |object|
         begin
@@ -44,6 +44,8 @@ module Floorplanner
 
           asset    = assets[refid]
           position = Geom::Number3D.from_str(object.find('points').first.content)
+          # correct Flash axis issues
+          position.y *= -1.0
 
           # correct Flash rotation issues
           rotation = unless object.find('rotation').empty?
@@ -58,8 +60,9 @@ module Floorplanner
           # find proper scale for object
           size     = object.find('size').first.content
           scale    = asset.scale_ratio(Geom::Number3D.from_str(size))
+
           mirrored = object.find('mirrored').first
-          reflection = Geom::Matrix3D.identity
+          reflection = Geom::Matrix3D.reflection(Geom::Plane.new(Geom::Number3D.new(0.0,1.0,0.0), Geom::Number3D.new))
           if mirrored
             mirror   = Geom::Number3D.from_str(mirrored)
             if mirror.x != 0 || mirror.y != 0 || mirror.z != 0
@@ -69,7 +72,7 @@ module Floorplanner
 
               origin = Geom::Number3D.new
               plane  = Geom::Plane.new(mirror,origin)
-              reflection = Geom::Matrix3D.reflection(plane)
+              reflection = Geom::Matrix3D.reflection(plane).multiply reflection
             end
           end
 
