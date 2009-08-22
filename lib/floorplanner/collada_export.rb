@@ -4,7 +4,7 @@ module Floorplanner
     def to_dae(design_id,out_path,xrefs=false)
       @design = Design.new(@xml,design_id)
       @design.build_geometries
-      @design.save_textures File.dirname(out_path)
+      @design.save_textures File.dirname(out_path) unless xrefs
       dae = File.new(out_path,'w')
       dae.write @design.to_dae xrefs
       dae.close
@@ -26,10 +26,11 @@ module Floorplanner
       # somehow...
       @walls.reverse
       @areas.each {|a| a.reverse}
+      @xrefs = xrefs
 
       template = ERB.new(
         File.read(
-          File.join(File.dirname(__FILE__), '..', '..', 'views', 'design'+(xrefs ? '_xrefs' : '')+'.dae.erb')))
+          File.join(File.dirname(__FILE__), '..', '..', 'views', 'design.dae.erb')))
       template.result(binding)
     end
 
@@ -38,11 +39,13 @@ module Floorplanner
       @assets = {}
       @xml.find(ASSETS_QUERY % @design_id).each do |asset_node|
         asset_id = asset_node.attributes['id']
-        url3d = asset_node.find('url3d')
-        next if url3d.empty?
+        name  = asset_node.find('name').first.content
+        url3d = asset_node.find('url3d').first
+        next unless url3d
+        url3d = url3d.content
 
         # TODO: store asset bounding box
-        asset = Floorplanner::Asset.get(asset_id,url3d.first.content)
+        asset = Floorplanner::Asset.get(asset_id,name,url3d)
         next unless asset
         @assets.store(asset_id, asset)
       end
@@ -105,11 +108,10 @@ module Floorplanner
     end
 
     def save_textures(root_path)
-      img_path = File.join(root_path,'images')
+      img_path = File.join(root_path,'textures')
       FileUtils.mkdir_p img_path
       assets.each_value do |asset|
-        a_dir = File.join(img_path,asset.name)
-        asset.save_textures a_dir
+        asset.save_textures img_path
       end
     end
   end

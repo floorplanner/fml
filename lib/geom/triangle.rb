@@ -1,12 +1,15 @@
 module Geom
   class Triangle
-    attr_accessor(:vertices,:normal)
-    def initialize(vertices,normal=nil)
+
+    attr_accessor :vertices, :texcoord, :normal
+
+    def initialize(vertices,texcoord=nil,normal=nil)
       unless vertices.length == 3
         raise "Triangle must consist of exactly 3 vertices"
       end
-      @normal = normal || Number3D.new
-      @vertices    = vertices
+      @normal   = normal || Number3D.new
+      @vertices = vertices
+      @texcoord = texcoord
       create_normal
     end
 
@@ -17,7 +20,7 @@ module Geom
     end
 
     def clone
-      Triangle.new(@vertices.collect{|v| v.clone})
+      Triangle.new(@vertices.collect{|v| v.clone},@texcoord.collect{|uv| uv.clone})
     end
 
     private

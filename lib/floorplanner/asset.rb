@@ -12,16 +12,16 @@ module Floorplanner
     CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'kmz')
     FileUtils.mkdir_p(CACHE_PATH)
 
-    attr_reader :id, :name, :dae_path
+    attr_reader :id, :name, :title, :dae_path
 
-    def self.get(asset_id,asset_url3d)
+    def self.get(asset_id,asset_title,asset_url3d)
       asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset_url3d)
       
       cached_path = File.join(CACHE_PATH,asset_id)
       if File.exists?(cached_path)
         $stderr.puts("Cached asset: %s" % asset_id)
         @kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(asset_id,@kmz)
+        Asset.new(asset_id,asset_title,@kmz)
       else
         $stderr.puts("Downloading asset: %s" % asset_url)
         cached = File.new(cached_path,'w')
@@ -30,16 +30,19 @@ module Floorplanner
         cached.close
 
         @kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(asset_id,@kmz)
+        asset = Asset.new(asset_id,asset_title,@kmz)
+        asset.adjust_paths!
+        asset
       end
     end
 
-    def initialize(id,kmz)
+    def initialize(id,title,kmz)
       @dae_path = kmz.dae_path(id)
-      @kmz  = kmz
-      @id   = id
-      @xml  = XML::Document.string(File.read(@dae_path).gsub(/xmlns=".+"/, ''))
-      @name = File.basename(@dae_path.gsub(/\.|dae/,''))
+      @kmz   = kmz
+      @id    = id
+      @title = title
+      @xml   = XML::Document.string(File.read(@dae_path).gsub(/xmlns=".+"/, ''))
+      @name  = File.basename(@dae_path.gsub(/\.|dae/,''))
       @images_dict = {}
     end
 
@@ -118,11 +121,26 @@ module Floorplanner
       images.each do |image|
         relative_to_dae = image.find('init_from').first.content
         img_path = @kmz.image_path(@id,relative_to_dae)
-        target_path = File.join(root_path,File.basename(img_path))
-        target = open(target_path,'w')
+        target_path = File.join(root_path,@id)
+        FileUtils.mkdir_p target_path
+
+        target = open(File.join(target_path,File.basename(img_path)),'w')
         target.write(File.read(img_path))
         target.close
-        @images_dict[relative_to_dae] = "images/#{@name}/#{File.basename(img_path)}"
+        @images_dict[relative_to_dae] = relative_to_dae[3..-1]
+      end
+    end
+
+    def adjust_paths!
+      images = @xml.find(LIBRARY_IMAGES)
+
+      images.each do |image|
+        init_from = image.find('init_from').first
+        img_path = @kmz.image_path(@id,init_from.content,true)
+        init_from.content = img_path
+      end
+      open(@dae_path, 'w') do |f|
+        f.write @xml.to_s
       end
     end
 

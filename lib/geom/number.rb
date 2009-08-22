@@ -1,6 +1,9 @@
 module Geom
+
   class Number3D
+
     attr_accessor(:x,:y,:z)
+
     def initialize(x=0,y=0,z=0)
       @x, @y, @z = x, y, z
     end
@@ -83,4 +86,19 @@ module Geom
       [@x,@y,@z].join ' '
     end
   end
+
+  class NumberUV
+
+    attr_accessor :u, :v
+    
+    def initialize(u=0,v=0)
+      @u = u
+      @v = v
+    end
+
+    def clone
+      NumberUV.new(u,v)
+    end
+  end
+
 end

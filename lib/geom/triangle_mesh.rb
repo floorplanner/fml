@@ -1,13 +1,15 @@
 module Geom
   class TriangleMesh
-    attr_accessor(:vertices,:faces,:meshes,:data,:tess)
-    def initialize(vertices=nil,faces=nil,user_data={})
+
+    attr_accessor(:vertices,:texcoord,:faces,:meshes,:data,:tess)
+
+    def initialize( vertices=nil, faces=nil, user_data=nil )
+      @data     = user_data || Hash.new
+      @faces    = faces     || Array.new
+      @vertices = vertices  || Array.new
       @meshes   = Array.new
-      @vertices = vertices || Array.new
-      @faces    = faces || Array.new
-      @data     = Hash.new
+
       @tess     = EarTrim
-      @data     = user_data
     end
 
     def << (mesh)
@@ -22,6 +24,11 @@ module Geom
     def faces
       result = @meshes.collect {|m| m.faces}.flatten
       result.empty? ? @faces : result
+    end
+
+    def texcoord
+      result = @meshes.collect {|m| m.texcoord}.flatten
+      result.empty? ? @texcoord : result
     end
 
     def update

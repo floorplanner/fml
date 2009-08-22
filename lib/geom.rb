@@ -1,6 +1,6 @@
 $LOAD_PATH.push(File.dirname(__FILE__))
 require 'matrix'
-require 'geom/number3d'
+require 'geom/number'
 require 'geom/vertex'
 require 'geom/triangle_mesh'
 require 'geom/polygon'

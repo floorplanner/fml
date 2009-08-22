@@ -27,20 +27,20 @@
       <instance_effect url="#walls-fx"/>
     </material>
     <% @areas.each do |area_mesh| %>
-      <material id="area_<%= area_mesh.data[:id] %>-material">
+      <material id="area_<%= area_mesh.data[:id] %>-material" name="<%= area_mesh.data[:name] %>">
         <instance_effect url="#area_<%= area_mesh.data[:id] %>-fx"/>
       </material>
     <% end %>
-    <% @assets.each_value do |asset| %>
+    <% unless @xrefs; @assets.each_value do |asset| %>
       <% asset.library_materials.each do |materials| %>
         <%= materials.to_s %>
       <% end %>
-    <% end %>
+    <% end; end %>
   </library_materials>
   <library_effects id="surrounding-effects">
     <effect id="walls-fx">
       <profile_COMMON>
-        <technique sid="blender">
+        <technique>
           <phong>
             <emission>
               <color>0.05 0.05 0.05 1</color>
@@ -73,10 +73,29 @@
         </technique>
       </profile_COMMON>
     </effect>
-    <% @areas.each do |area_mesh| %>
-      <effect id="area_<%= area_mesh.data[:id] %>-fx">
+    <% @areas.each do |area_mesh|; id = area_mesh.data[:id].to_s %>
+      <effect id="area_<%= id %>-fx" name="<%= area_mesh.data[:name] %>">
         <profile_COMMON>
-          <technique sid="blender">
+          <% if area_mesh.data[:texture] %>
+          <newparam sid="area_<%= id %>-surface">
+              <surface type="2D">
+                <init_from>area_<%= id %>-image</init_from>
+              </surface>
+          </newparam>
+          <newparam sid="area_<%= id %>-sampler">
+              <sampler2D>
+                <source>area_<%= id %>-surface</source>
+              </sampler2D>
+          </newparam>
+          <% end %>
+          <% if area_mesh.data[:texture] %>
+            <extra>
+              <technique sid="sunflow">
+                <diffuse><%= area_mesh.data[:color].join(' ') %></diffuse>
+              </technique>
+            </extra>
+          <% end %>
+          <technique>
             <phong>
               <emission>
                 <color>0.05 0.05 0.05 1</color>
@@ -85,7 +104,11 @@
                 <color>0.1 0.1 0.1 1</color>
               </ambient>
               <diffuse>
+                <% if area_mesh.data[:texture] %>
+                <texture texture="area_<%= id %>-sampler"/>
+                <% else %>
                 <color><%= area_mesh.data[:color].join(' ') %> 1</color>
+                <% end %>
               </diffuse>
               <specular>
                 <color>0 0 0 1</color>
@@ -110,18 +133,25 @@
         </profile_COMMON>
       </effect>
     <% end %>
-    <% @assets.each_value do |asset| %>
+    <% unless @xrefs; @assets.each_value do |asset| %>
       <% asset.library_effects.each do |effects| %>
         <%= effects.to_s %>
       <% end %>
-    <% end %>
+    <% end; end %>
   </library_effects>
   <library_images>
-    <% @assets.each_value do |asset| %>
+    <% @areas.each do |area_mesh|; if area_mesh.data[:texture] %>
+    <image id="area_<%= area_mesh.data[:id] %>-image" name="<%= area_mesh.data[:name] %>">
+    <init_from><%= Floorplanner.config['area_textures_path'] + 
+                   area_mesh.data[:texture].gsub('textures/2d/','').gsub(/\.swf$/,'.png') %></init_from>
+    </image>
+    <% end; end %>
+
+    <% unless @xrefs; @assets.each_value do |asset| %>
       <% asset.library_images.each do |image| %>
         <%= image.to_s %>
       <% end %>
-    <% end %>
+    <% end; end %>
   </library_images>
   <library_geometries id="surrounding-geometry">
     <geometry id="walls-geom" name="WallsGeometry">
@@ -167,7 +197,7 @@
       </mesh>
     </geometry>
     <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
-      <geometry id="area_<%= id %>-geom" name="Area_<%= id %>-Geometry">
+    <geometry id="area_<%= id %>-geom" name="Area_<%= id %>_<%= area_mesh.data[:name] %>-Geometry">
         <mesh>
           <source id="area_<%= id %>-positions" name="position">
 
@@ -183,17 +213,15 @@
               </accessor>
             </technique_common>
           </source>
-          <source id="area_<%= id %>-normals" name="normal">
 
-            <float_array id="area_<%= id %>-normals-array" count="<%= area_mesh.faces.length*3 %>">
-              <%= area_mesh.faces.collect{|f| [f.normal.x,f.normal.y,f.normal.z]}.flatten.join(' ') %>
+          <source id="area_<%= id %>-uvs" name="texcoord">
+            <float_array id="area_<%= id %>-uvs-array" count="<%= area_mesh.texcoord.length %>">
+              <%= area_mesh.texcoord.map{|n| [n.u,n.v]}.flatten.join(' ') %>
             </float_array>
-
             <technique_common>
-              <accessor count="<%= area_mesh.faces.length %>" offset="0" source="#area_<%= id %>-normals-array" stride="3">
-                <param name="X" type="float"></param>
-                <param name="Y" type="float"></param>
-                <param name="Z" type="float"></param>
+              <accessor count="44" source="#area_<%= id %>-uvs-array" stride="2">
+                <param name="S" type="float"/>
+                <param name="T" type="float"/>
               </accessor>
             </technique_common>
           </source>
@@ -202,21 +230,29 @@
             <input semantic="POSITION" source="#area_<%= id %>-positions"/>
           </vertices>
 
-          <triangles count="<%= area_mesh.faces.length %>" material="Area_<%= id %>">
+          <triangles count="<%= area_mesh.faces.length %>" material="<%= "Area_"+id %>">
             <input semantic="VERTEX" source="#area_<%= id %>-vertices" offset="0"/>
-             <p>
-               <%= area_mesh.faces.collect{|f| f.vertices.collect{|v| area_mesh.vertices.index(v)}}.flatten.join(' ') %>
+            <input semantic="TEXCOORD" source="#area_<%= id %>-uvs" offset="1"/>
+            <p>
+              <%=
+                area_mesh.faces.collect { |f|
+                  v = f.vertices.collect { |v| area_mesh.vertices.index(v) }
+                  t = f.texcoord.collect { |t| area_mesh.texcoord.index(t) }
+                  [v[0],t[0],v[1],t[1],v[2],t[2]]
+                }.flatten.join(' ')
+              %>
              </p>
           </triangles>
         </mesh>
       </geometry>
     <% end %>
-    <% @assets.each_value do |asset| %>
+    <% unless @xrefs; @assets.each_value do |asset| %>
       <% asset.library_geometries.each do |geometries| %>
         <%= geometries.to_s %>
       <% end %>
-    <% end %>
+    <% end; end %>
   </library_geometries>
+  <% unless @xrefs %>
   <library_nodes>
     <% @assets.each_value do |asset| %>
       <% asset.library_nodes.each do |nodes| %>
@@ -224,12 +260,13 @@
       <% end %>
     <% end %>
   </library_nodes>
+  <% end %>
   <library_visual_scenes>
   <visual_scene id="VisualSceneNode" name="<%= @name %>">
       <extra>
         <technique sid="sunflow">
           <image>
-            <resolution>160 120</resolution>
+            <resolution>800 600</resolution>
             <aa>0 2</aa>
             <filter>gaussian</filter>
             <sampler>ipr</sampler>
@@ -242,7 +279,7 @@
             <type>ambocc</type>
             <bright>1 1 1</bright>
             <dark>0 0 0</dark>
-            <samples>128</samples>
+            <samples>64</samples>
             <maxdist>3.0 </maxdist>
           </gi>
           <sunsky>
@@ -255,8 +292,8 @@
       </extra>
       <node id="Camera" name="Camera">
         <lookat>
-          5.0 9.0 2.0
-          6.0 8.0 1.8
+          9.0 -1.0 1.4
+          8.0 -2.0 1.4
           0.0 0.0 1.0
         </lookat>
         <instance_camera url="#main-cam"/>
@@ -281,10 +318,22 @@
               </bind_material>
             </instance_geometry>
           </node>
+          <% if area_mesh.data[:type] == 'generated_area' %>
+            <node id="Area_<%= id %>-cap" name="Area_<%= id %>-cap">
+              <translate>0.0 0.0 <%= @areas.ceiling_z %></translate>
+              <instance_geometry url="#area_<%= id %>-geom">
+                <bind_material>
+                  <technique_common>
+                    <instance_material symbol="Area_<%= id %>" target="#walls-material"/>
+                  </technique_common>
+                </bind_material>
+              </instance_geometry>
+            </node>
+          <% end %>
         <% end %>
       </node>
       <% @elements.each do |element| %>
-        <node>
+        <node name="<%= element[:asset].title %>">
           <translate><%= element[:position].to_floats %></translate>
           <% if element[:matrix] %>
             <matrix><%= element[:matrix].to_a.join ' ' %></matrix>
@@ -299,7 +348,11 @@
             <rotate sid="rotateZ">0 0 1 <%= element[:rotation].z %></rotate>
           <% end %>
           <scale><%= element[:scale].to_floats %></scale>
-          <%= element[:asset].visual_scene_node.to_s  %>
+          <% if @xrefs %>
+            <instance_node url="<%= element[:asset].dae_path %>"/>
+          <% else %>
+            <%= element[:asset].visual_scene_node.to_s  %>
+          <% end %>
         </node>
       <% end %>
     </visual_scene>

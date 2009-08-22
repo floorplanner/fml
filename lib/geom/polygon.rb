@@ -12,6 +12,33 @@ module Geom
     CAP_BASE     = 5
     CAP_BOTH     = 6
 
+    def clone
+      vertices = @vertices.collect{|v| v.clone}
+      texcoord = @texcoord ? @texcoord.collect{|uv| uv.clone} : nil
+      faces    = @faces.collect do |f|
+        if texcoord
+          Triangle.new([
+            vertices[ @vertices.index(f.vertices[0]) ],
+            vertices[ @vertices.index(f.vertices[1]) ],
+            vertices[ @vertices.index(f.vertices[2]) ]
+          ],[
+            texcoord[ @texcoord.index(f.texcoord[0]) ],
+            texcoord[ @texcoord.index(f.texcoord[1]) ],
+            texcoord[ @texcoord.index(f.texcoord[2]) ]
+          ])
+        else
+          Triangle.new([
+            vertices[ @vertices.index(f.vertices[0]) ],
+            vertices[ @vertices.index(f.vertices[1]) ],
+            vertices[ @vertices.index(f.vertices[2]) ]
+          ])
+        end
+      end
+      result = Polygon.new(vertices,faces,@data.dup)
+      result.texcoord = texcoord
+      result
+    end
+
     def update
       return false if @vertices.length < 3
       triangles = @tess.triangulate(self)
@@ -21,11 +48,16 @@ module Geom
         return false unless triangles
       end
 
+      @texcoord = calc_uv
       triangles.each do |t|
         v0 = @vertices[t[0]]
         v1 = @vertices[t[1]]
         v2 = @vertices[t[2]]
-        @faces.push(Triangle.new([v2,v1,v0]))
+
+        t0 = @texcoord[t[0]]
+        t1 = @texcoord[t[1]]
+        t2 = @texcoord[t[2]]
+        @faces.push(Triangle.new([v2,v1,v0],[t0,t1,t2]))
       end
       true
     end
@@ -122,18 +154,6 @@ module Geom
       area < 0 ? WINDING_CW : WINDING_CCW
     end
 
-    def clone
-      vertices = @vertices.collect{|v| v.clone}
-      faces    = @faces.collect do |f|
-        Triangle.new([
-          vertices[ @vertices.index(f.vertices[0]) ],
-          vertices[ @vertices.index(f.vertices[1]) ],
-          vertices[ @vertices.index(f.vertices[2]) ]
-        ])
-      end
-      Polygon.new(vertices,faces)
-    end
-
     def extrude(distance,direction,cap=CAP_BOTH,update=true)
       direction.normalize
       top_cap = clone
@@ -186,5 +206,59 @@ module Geom
       end
       axis
     end
+
+    def calc_uv
+      result = []
+      plane = self.plane
+      up = Number3D.new( 0, 1, 0 )
+      
+      # get side vector
+      side = Number3D.cross(up, plane.normal)
+      side.normalize
+
+      # adjust up vector
+      up = Number3D.cross(self.plane.normal, side)
+      up.normalize
+      
+      matrix  = Matrix3D[
+              [side.x, up.x, plane.normal.x, 0],
+              [side.y, up.y, plane.normal.y, 0],
+              [side.z, up.z, plane.normal.z, 0],
+              [0, 0, 0, 1]]
+      
+      v, n, t = nil, nil, nil
+      min = Number3D.new(1000,1000,1000)
+      max = Number3D.new(-min.x, -min.y, -min.z)
+      pts = []
+
+      @vertices.each do |v|
+        n = v.position
+        
+        # Matrix3D.multiplyVector3x3( matrix, n );
+        
+        min.x = n.x if n.x < min.x
+        min.y = n.y if n.y < min.y
+        max.x = n.x if n.x > max.x
+        max.y = n.y if n.y > max.y
+        
+        pts << n
+        result << NumberUV.new
+      end
+      
+      w = max.x - min.x
+      h = max.y - min.y
+      size = w < h ? h : w
+      
+      @vertices.each_with_index do |v,i|
+        n = pts[i]
+        t = result[i]
+
+        t.u = ((n.x - min.x) / size) * size
+        t.v = ((n.y - min.y) / size) * size
+      end
+      
+      result
+    end
+
   end
 end

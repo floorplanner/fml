@@ -17,7 +17,7 @@ module Keyhole
       @dae_path
     end
 
-    def image_path(asset_id,relative_to_dae)
+    def image_path(asset_id,relative_to_dae,relative_out=false)
       img_path = File.join(File.dirname(@relative_dae_path),relative_to_dae)
       target_path = File.join(IMG_CACHE_PATH,asset_id)
       tex_path = File.join(target_path,File.basename(img_path))
@@ -27,7 +27,7 @@ module Keyhole
         zip_image = entries.select{|e| e.name.match(File.basename(img_path)) }.first
         extract( zip_image , tex_path )
       end
-      tex_path
+      relative_out ? '../textures'+tex_path.gsub(IMG_CACHE_PATH,'') : tex_path
     end
 
     def destroy

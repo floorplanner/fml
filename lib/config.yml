@@ -1,7 +1,9 @@
 content_base_url: http://cdn.floorplanner.com/assets/
-dae_cache_path: /tmp/fml2dae_cache/
+dae_cache_path: /home/skrat/workspace/floorplanner/fml2dae_cache/
+area_textures_path: /home/skrat/workspace/floorplanner/fml2dae_cache/textures_2d/
 
 geom_snap:  0.1
+uniq_snap:  0.0000005
 openings:
   window_base:   0.65
   window_height: 1.6

@@ -2,6 +2,8 @@ module Floorplanner
   class Design
     DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
     DESIGN_N_QUERY = "/project/floors/floor/designs/design[name='%s']"
+    ASSET_QUERY    = DESIGN_QUERY+"/assets/asset[@id='%s']"
+    ASSET_URL2D    = ASSET_QUERY+"/url2d"
     LINES_QUERY    = DESIGN_QUERY+"/lines/line"
     OPENINGS_QUERY = DESIGN_QUERY+"/objects/object[type='opening']"
     AREAS_QUERY    = DESIGN_QUERY+"/areas/area"
@@ -36,25 +38,34 @@ module Floorplanner
     def build_geometries
       @areas = AreaBuilder.new do |b|
         @xml.find(AREAS_QUERY % @design_id).each do |area|
-          color  = area.find('color').first.content
-          type   = area.find('type').first.content
+          name  = area.find('name').first.content
+          color = area.find('color').first.content
+          type  = area.find('type').first.content
+
+          asset_id = area.find('asset').first.attributes['refid']
+          texture_url = @xml.find(ASSET_URL2D % [@design_id,asset_id]).first.content
 
           vertices = Array.new
           area.find('points').first.content.split(',').each do |str_v|
             floats = str_v.strip.split(/\s/).map! {|f| f.to_f}
 
-            # TODO: fix this in Flash app
+            # TODO: fix y coords in Flash app
             floats[1] *= -1.0; floats[4] *= -1.0
 
             vertices << b.vertex(Geom::Vertex.new(*floats[0..2]))
             vertices << b.vertex(Geom::Vertex.new(*floats[3..5]))
           end
 
-          b.area(vertices,color,type)
+          b.area(vertices,
+            :color => color,
+            :name => name,
+            :texture => texture_url,
+            :type => type)
+
         end
       end
       min_height = 10
-      @walls  = WallBuilder.new do |b|
+      @walls = WallBuilder.new do |b|
         @xml.find(LINES_QUERY % @design_id).each do |line|
           floats = line.find('points').first.get_floats
           
@@ -73,10 +84,12 @@ module Floorplanner
         end
       end
       @areas.update min_height
+
       @walls.prepare
       @xml.find(OPENINGS_QUERY % @design_id).each do |opening|
         pos_floats  = opening.find('points').first.get_floats
-        # TODO: fix this in Flash app
+
+        # TODO: fix y coord in Flash app
         pos_floats[1] *= -1
 
         size_floats = opening.find('size').first.get_floats

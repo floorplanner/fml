@@ -1,6 +1,6 @@
 module Floorplanner
   class WallBuilder < Geom::TriangleMesh
-    SNAP = 
+
     def initialize(&block)
       super()
       @connections = Hash.new
@@ -18,7 +18,7 @@ module Floorplanner
     end
 
     def vertex(vertex)
-      if existing = find_vertex(vertex)
+      if existing = find_vertex(@base_vertices,vertex,Floorplanner.config['geom_snap'])
         existing
       else
         @base_vertices << vertex
@@ -105,12 +105,11 @@ module Floorplanner
 
     def update
       @walls.each do |wall|
-        wall.update
         # here comes the cache
+        wall.update
         @vertices.concat(wall.vertices)
         @faces.concat(wall.faces)
       end
-      build_ceiling
 
       $stderr.puts "Walls Vertices before: #{@vertices.length.to_s}"
       # remove same instances
@@ -119,7 +118,7 @@ module Floorplanner
       old = @vertices.dup
       @vertices = Array.new
       old.each do |v|
-        @vertices.push(v) unless @vertices.include?(v)
+        @vertices.push(v) unless @vertices.include?(v) # find_vertex(@vertices,v) # 
       end
       $stderr.puts "Walls Vertices: #{@vertices.length.to_s}"
       $stderr.puts "Walls Faces   : #{@faces.length.to_s}"
@@ -134,7 +133,7 @@ module Floorplanner
       @faces
     end
 
-    private
+  private
 
     def find_wall(sp,ep)
       @walls.each do |wall|
@@ -149,24 +148,14 @@ module Floorplanner
       nil
     end
 
-    def find_vertex(v)
-      @base_vertices.each do |vertex|
-        if v.equal?(vertex,Floorplanner.config['geom_snap'])
+    def find_vertex(arr,v,snap=Floorplanner.config['uniq_snap'])
+      arr.each do |vertex|
+        if v.equal?(vertex,snap)
           return vertex
         end
       end
-      return nil
+      nil
     end
 
-    def build_ceiling
-      vs = @base_vertices.dup
-      p = Geom::Polygon.new(vs)
-      p.vertices.each do |v|
-        # p.vertices.delete(v) if p.point_inside(v)
-      end
-      p.update
-      @vertices.concat(p.vertices)
-      @faces.concat(p.faces)
-    end
   end
 end

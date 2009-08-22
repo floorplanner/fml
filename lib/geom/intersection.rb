@@ -26,8 +26,8 @@ module Geom
         
         result.alpha.push(ua,ub)
         if infinite || ((ua > 0 && ua < 1) && (ub > 0 && ub < 1))
-          x = x1 + ua*(x2-x1);
-          y = y1 + ua*(y2-y1);
+          x = x1 + ua*(x2-x1)
+          y = y1 + ua*(y2-y1)
           result.points << Number3D.new(x,y)
           result.status = INTERSECTION;
         end
