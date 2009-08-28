@@ -4,7 +4,7 @@ module Floorplanner
     TYPE_DOOR   = 1
     TYPE_WINDOW = 2
 
-    attr_accessor(:position)
+    attr_accessor(:position,:window)
 
     def initialize(baseline,thickness,opening)
       super()
@@ -28,6 +28,7 @@ module Floorplanner
       v2 = Geom::Vertex.new( width/2,0,0)
       o_base = Geom::Edge.new(v1,v2)
       
+      # create opening side
       o_inner = o_base.offset(thickness/2.0,Wall3D::UP)
       o_outer = o_base.offset(-thickness/2.0,Wall3D::UP)
 
@@ -52,6 +53,32 @@ module Floorplanner
       
       @meshes << @base
       @meshes.concat(extrusion)
+
+      # create glass
+      if @type == TYPE_WINDOW
+        g_inner = o_base.offset( 0.02, Wall3D::UP)
+        g_outer = o_base.offset(-0.02, Wall3D::UP)
+
+        glass_base = Geom::Polygon.new([
+          g_inner.end_point, g_inner.start_point,
+          g_outer.start_point  , g_outer.end_point
+        ])
+
+        # rotate in wall's direction
+        glass_base.transform_vertices(Geom::Matrix3D.rotationZ(angle))
+        # move to position
+        glass_base.transform_vertices(Geom::Matrix3D.translation(@position.x,@position.y,@position.z))
+
+        extrusion = glass_base.extrude(height,Wall3D::UP,nil,false)
+
+        # flip base cap
+        glass_base.reverse
+
+        @window = Geom::TriangleMesh.new
+        @window.meshes.concat extrusion
+        @window << glass_base
+        @window.update
+      end
     end
 
     # drill hole to sides
@@ -61,7 +88,7 @@ module Floorplanner
       # opening start
       t1   = @meshes.first.vertices[outer ? 0 : 3].clone
       t1.z = side.vertices[0].z
-      t1b  = @meshes.last.vertices[outer ? 0 : 3]
+      t1b  = @meshes[3].vertices[outer ? 0 : 3]
 
       b1   = @meshes.first.vertices[outer ? 0 : 3].clone
       b1.z = side.vertices[2].z
@@ -70,7 +97,7 @@ module Floorplanner
       # opening end
       t2   = @meshes.first.vertices[outer ? 1 : 2].clone
       t2.z = side.vertices[0].z
-      t2b  = @meshes.last.vertices[outer ? 1 : 2]
+      t2b  = @meshes[3].vertices[outer ? 1 : 2]
 
       b2   = @meshes.first.vertices[outer ? 1 : 2].clone
       b2.z = side.vertices[2].z

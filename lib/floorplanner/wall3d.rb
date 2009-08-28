@@ -19,6 +19,10 @@ module Floorplanner
       @openings << {:position => position, :size => size, :type => type}
     end
 
+    def windows
+      @openings.collect{|o| o.window}.compact
+    end
+
     # create base 'outline' polygon of wall
     def prepare(num_start_connections,num_end_connections)
       @outline = Geom::Polygon.new

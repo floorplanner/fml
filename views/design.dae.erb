@@ -8,7 +8,8 @@
     <modified>2006-06-21T21:23:22Z</modified>
     <unit meter="1.00" name="meter"/>
     <up_axis>Z_UP</up_axis>
-    </asset>
+  </asset>
+  
   <library_cameras>
     <camera id="main-cam">
       <optics>
@@ -22,9 +23,13 @@
       </optics>
     </camera>
   </library_cameras>
+
   <library_materials id="surrounding-materials">
     <material id="walls-material" name="WallsMaterial">
       <instance_effect url="#walls-fx"/>
+    </material>
+    <material id="windows-material" name="WindowsMaterial">
+      <instance_effect url="#windows-fx"/>
     </material>
     <% @areas.each do |area_mesh| %>
       <material id="area_<%= area_mesh.data[:id] %>-material" name="<%= area_mesh.data[:name] %>">
@@ -37,6 +42,7 @@
       <% end %>
     <% end; end %>
   </library_materials>
+
   <library_effects id="surrounding-effects">
     <effect id="walls-fx">
       <profile_COMMON>
@@ -68,6 +74,41 @@
             </transparent>
             <transparency>
               <float>0.0</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="windows-fx">
+      <profile_COMMON>
+        <technique>
+          <phong>
+            <emission>
+              <color>0.0 0.0 0.0 1</color>
+            </emission>
+            <ambient>
+              <color>0.15 0.15 0.15 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.9 0.9 1.0 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>0.0</float>
+            </shininess>
+            <reflective>
+              <color>1 1 1 1</color>
+            </reflective>
+            <reflectivity>
+              <float>0.2</float>
+            </reflectivity>
+            <transparent>
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>0.9</float>
             </transparency>
           </phong>
         </technique>
@@ -139,6 +180,7 @@
       <% end %>
     <% end; end %>
   </library_effects>
+
   <library_images>
     <% @areas.each do |area_mesh|; if area_mesh.data[:texture] %>
     <image id="area_<%= area_mesh.data[:id] %>-image" name="<%= area_mesh.data[:name] %>">
@@ -153,7 +195,9 @@
       <% end %>
     <% end; end %>
   </library_images>
+
   <library_geometries id="surrounding-geometry">
+
     <geometry id="walls-geom" name="WallsGeometry">
       <mesh>
         <source id="walls-positions" name="position">
@@ -169,20 +213,6 @@
             </accessor>
           </technique_common>
         </source>
-        <source id="walls-normals" name="normal">
-
-          <float_array id="walls-normals-array" count="<%= @walls.faces.length*3 %>">
-            <%= @walls.faces.collect{|f| [f.normal.x,f.normal.y,f.normal.z]}.flatten.join(' ') %>
-          </float_array>
-
-          <technique_common>
-            <accessor count="<%= @walls.faces.length %>" offset="0" source="#walls-normals-array" stride="3">
-              <param name="X" type="float"></param>
-              <param name="Y" type="float"></param>
-              <param name="Z" type="float"></param>
-            </accessor>
-          </technique_common>
-        </source>
 
         <vertices id="walls-vertices">
           <input semantic="POSITION" source="#walls-positions"/>
@@ -192,6 +222,43 @@
            <input semantic="VERTEX" source="#walls-vertices" offset="0"/>
            <p>
              <%= @walls.faces.collect{|f| f.vertices.collect{|v| @walls.vertices.index(v)}}.flatten.join(' ') %>
+           </p>
+        </triangles>
+      </mesh>
+    </geometry>
+
+    <geometry id="windows-geom" name="WindowsGeometry">
+    <%
+      windows_vertices = @walls.windows.collect {|w| w.vertices}.flatten
+      windows_faces = @walls.windows.collect {|w| w.faces}.flatten
+    %>
+      <mesh>
+        <source id="windows-positions" name="position">
+          <float_array id="windows-positions-array" count="<%= @walls.vertices.length*3 %>">
+            <%= windows_vertices.collect {|v| v.to_floats }.join(' ') %>
+          </float_array>
+
+          <technique_common>
+            <accessor count="<%= windows_vertices.length %>" offset="0" source="#windows-positions-array" stride="3">
+              <param name="X" type="float"></param>
+              <param name="Y" type="float"></param>
+              <param name="Z" type="float"></param>
+            </accessor>
+          </technique_common>
+        </source>
+
+        <vertices id="windows-vertices">
+          <input semantic="POSITION" source="#windows-positions"/>
+        </vertices>
+
+        <triangles count="<%= windows_faces.length %>" material="Window">
+           <input semantic="VERTEX" source="#windows-vertices" offset="0"/>
+           <p>
+             <% offset = 0
+                @walls.windows.each do |w|
+             %>
+               <%= w.faces.collect{|f| f.vertices.collect{|v| w.vertices.index(v) + offset}}.flatten.join(' ') %>
+             <% offset += w.vertices.length ; end %>
            </p>
         </triangles>
       </mesh>
@@ -303,6 +370,15 @@
           <bind_material>
             <technique_common>
               <instance_material symbol="Walls" target="#walls-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Windows" name="Windows">
+        <instance_geometry url="#windows-geom">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Window" target="#windows-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>

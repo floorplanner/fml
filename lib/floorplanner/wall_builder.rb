@@ -133,6 +133,10 @@ module Floorplanner
       @faces
     end
 
+    def windows
+      @walls.collect{|w| w.windows}.flatten
+    end
+
   private
 
     def find_wall(sp,ep)
