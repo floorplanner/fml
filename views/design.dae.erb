@@ -116,6 +116,13 @@
     </effect>
     <% @areas.each do |area_mesh|; id = area_mesh.data[:id].to_s %>
       <effect id="area_<%= id %>-fx" name="<%= area_mesh.data[:name] %>">
+        <% if area_mesh.data[:texture] %>
+          <extra>
+            <technique sid="sunflow">
+              <diffuse><%= area_mesh.data[:color].join(' ') %></diffuse>
+            </technique>
+          </extra>
+        <% end %>
         <profile_COMMON>
           <% if area_mesh.data[:texture] %>
           <newparam sid="area_<%= id %>-surface">
@@ -128,13 +135,6 @@
                 <source>area_<%= id %>-surface</source>
               </sampler2D>
           </newparam>
-          <% end %>
-          <% if area_mesh.data[:texture] %>
-            <extra>
-              <technique sid="sunflow">
-                <diffuse><%= area_mesh.data[:color].join(' ') %></diffuse>
-              </technique>
-            </extra>
           <% end %>
           <technique>
             <phong>
