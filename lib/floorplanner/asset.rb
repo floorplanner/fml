@@ -10,11 +10,11 @@ module Floorplanner
     NO_NS_NAME = %w{ param }
 
     CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'kmz')
-    FileUtils.mkdir_p(CACHE_PATH)
 
     attr_reader :id, :name, :title, :dae_path
 
     def self.get(asset_id,asset_title,asset_url3d)
+      FileUtils.mkdir_p(CACHE_PATH)
       asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset_url3d)
       
       cached_path = File.join(CACHE_PATH,asset_id)

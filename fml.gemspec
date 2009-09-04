@@ -63,11 +63,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<libxml-ruby>)
+      s.add_runtime_dependency(%q<rubyzip>)
     else
       s.add_dependency(%q<libxml-ruby>)
+      s.add_dependency(%q<rubyzip>)
     end
   else
     s.add_dependency(%q<libxml-ruby>)
+    s.add_dependency(%q<rubyzip>)
   end
 end
 
