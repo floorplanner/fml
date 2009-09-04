@@ -3,10 +3,8 @@ module Keyhole
     DAE_CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'],'dae')
     IMG_CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'],'textures')
 
-    FileUtils.mkdir_p DAE_CACHE_PATH
-    FileUtils.mkdir_p IMG_CACHE_PATH
-
     def dae_path(asset_id)
+      FileUtils.mkdir_p DAE_CACHE_PATH
       dae = entries.select{|e| e.name.match(/\.dae$/)}.first
       @relative_dae_path = dae.name
       @dae_path = File.join(
@@ -18,6 +16,7 @@ module Keyhole
     end
 
     def image_path(asset_id,relative_to_dae,relative_out=false)
+      FileUtils.mkdir_p IMG_CACHE_PATH
       img_path = File.join(File.dirname(@relative_dae_path),relative_to_dae)
       target_path = File.join(IMG_CACHE_PATH,asset_id)
       tex_path = File.join(target_path,File.basename(img_path))
