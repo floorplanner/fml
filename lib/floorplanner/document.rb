@@ -33,7 +33,7 @@ module Floorplanner
 
   class DesignDocument
     def initialize(fml_fn)
-      @xml = XML::Document.file(fml_fn)
+      @xml = LibXML::XML::Document.file(fml_fn)
     end
 
     def update_heights(new_height)
