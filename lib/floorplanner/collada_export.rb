@@ -4,9 +4,9 @@ module Floorplanner
     def to_dae(design_id,out_path,xrefs=false)
       @design = Design.new(@xml,design_id)
       @design.build_geometries
-      @design.save_textures File.dirname(out_path) unless xrefs
+      @design.save_textures(File.dirname(out_path)) unless xrefs
       dae = File.new(out_path,'w')
-      dae.write @design.to_dae xrefs
+      dae.write(@design.to_dae(xrefs))
       dae.close
     end
 
