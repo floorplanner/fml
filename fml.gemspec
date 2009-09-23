@@ -1,61 +1,21 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{fml}
+  s.name    = "fml"
   s.version = "0.2"
-
+  s.date    = "2009-06-30"
+  
   s.required_rubygems_version = Gem::Requirement.new(">= 1.3.0") if s.respond_to? :required_rubygems_version=
+  
   s.authors = ["Dusan Maliarik"]
-  s.date = %q{2009-06-30}
   s.description = %q{Floor plan document toolkit}
   s.email = %q{dusan.maliarik@gmail.com}
   s.executables = ["fml2dae.rb","fml2obj.rb"]
-  s.files = ["README",
-             "bin/fml2dae.rb",
-             "bin/fml2obj.rb",
-
-             "lib/config.yml",
-             "lib/floorplanner.rb",
-             "lib/floorplanner/area_builder.rb",
-             "lib/floorplanner/asset.rb",
-             "lib/floorplanner/collada_export.rb",
-             "lib/floorplanner/design.rb",
-             "lib/floorplanner/document.rb",
-             "lib/floorplanner/obj_export.rb",
-             "lib/floorplanner/opening3d.rb",
-             "lib/floorplanner/rib_export.rb",
-             "lib/floorplanner/svg_export.rb",
-             "lib/floorplanner/wall3d.rb",
-             "lib/floorplanner/wall_builder.rb",
-
-             "lib/geom.rb",
-             "lib/geom/connection.rb",
-             "lib/geom/ear_trim.rb",
-             "lib/geom/edge.rb",
-           # "lib/geom/glu_tess.rb",
-             "lib/geom/intersection.rb",
-             "lib/geom/matrix3d.rb",
-             "lib/geom/number.rb",
-             "lib/geom/plane.rb",
-             "lib/geom/polygon.rb",
-             "lib/geom/triangle_mesh.rb",
-             "lib/geom/triangle.rb",
-             "lib/geom/vertex.rb",
-             "lib/collada/document.rb",
-             "lib/collada/geometry.rb",
-             "lib/keyhole/archive.rb",
-
-             "views/design.dae.erb",
-             "views/design.obj.erb",
-             "views/design.svg.erb",
-             "views/design.rib.erb",
-
-             "xml/fml.rng", "xml/collada_schema_1_4.xsd"
-  ]
+  s.files = %w(lib/keyhole/archive.rb lib/geom/plane.rb lib/floorplanner/area_builder.rb bin/fml2dae.rb .gitignore xml/fml2kml.xsl xml/collada_schema_1_4.xsd lib/geom/number.rb lib/geom/connection.rb lib/floorplanner/design.rb lib/floorplanner/collada_export.rb lib/geom/polygon.rb lib/geom.rb lib/floorplanner/asset.rb xml/fml.rng views/design.rib.erb lib/geom/matrix3d.rb lib/geom/ear_trim.rb lib/floorplanner/obj_export.rb lib/floorplanner.rb README views/design.obj.erb views/design.dae.erb lib/config.yml lib/geom/intersection.rb lib/floorplanner/svg_export.rb lib/floorplanner/rib_export.rb fml.gemspec Rakefile tasks/github-gem.rake lib/geom/triangle.rb lib/geom/edge.rb bin/fml2obj.rb lib/geom/triangle_mesh.rb lib/floorplanner/wall_builder.rb lib/floorplanner/wall3d.rb lib/floorplanner/document.rb lib/floorplanner/opening3d.rb lib/collada/geometry.rb views/design.svg.erb lib/geom/vertex.rb lib/geom/glu_tess.rb lib/collada/document.rb)
   s.homepage = %q{http://floorplanner.com/}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.1}
-  s.summary = %q{Floor plan document toolkit}
+  s.summary = %q{Floorplanner.com FML document toolkit}
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
