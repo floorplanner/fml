@@ -91,7 +91,7 @@ module Geom
       a = plane.normal.x
       b = plane.normal.y
       c = plane.normal.z
-      
+
       self[
         [1-(2*a*a) , 0-(2*a*b) , 0-(2*a*c) , 0],
         [0-(2*a*b) , 1-(2*b*b) , 0-(2*b*c) , 0],

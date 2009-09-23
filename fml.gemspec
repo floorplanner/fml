@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
   s.executables = ["fml2dae.rb","fml2obj.rb"]
   s.files = ["README",
              "bin/fml2dae.rb",
-             "bin/fml2obj.rb", 
-             
+             "bin/fml2obj.rb",
+
              "lib/config.yml",
              "lib/floorplanner.rb",
              "lib/floorplanner/area_builder.rb",

@@ -102,7 +102,7 @@ module Geom
           result += (point.x * (points[j].y - points[k].y))
         end
       end
-              
+
       # scale to get area before projection
       an = Math.sqrt(ax**2 + ay**2 + az**2) # length of normal vector
       case coord
@@ -130,7 +130,7 @@ module Geom
       dominant = dominant_axis
       dist = self.plane.distance(pt)
       result = false
-      
+
       return false if dist.abs > 0.01
       case dominant
       when AXIS_X
@@ -211,7 +211,7 @@ module Geom
       result = []
       plane = self.plane
       up = Number3D.new( 0, 1, 0 )
-      
+
       # get side vector
       side = Number3D.cross(up, plane.normal)
       side.normalize
@@ -219,13 +219,13 @@ module Geom
       # adjust up vector
       up = Number3D.cross(self.plane.normal, side)
       up.normalize
-      
+
       matrix  = Matrix3D[
               [side.x, up.x, plane.normal.x, 0],
               [side.y, up.y, plane.normal.y, 0],
               [side.z, up.z, plane.normal.z, 0],
               [0, 0, 0, 1]]
-      
+
       v, n, t = nil, nil, nil
       min = Number3D.new(1000,1000,1000)
       max = Number3D.new(-min.x, -min.y, -min.z)
@@ -233,22 +233,22 @@ module Geom
 
       @vertices.each do |v|
         n = v.position
-        
+
         # Matrix3D.multiplyVector3x3( matrix, n );
-        
+
         min.x = n.x if n.x < min.x
         min.y = n.y if n.y < min.y
         max.x = n.x if n.x > max.x
         max.y = n.y if n.y > max.y
-        
+
         pts << n
         result << NumberUV.new
       end
-      
+
       w = max.x - min.x
       h = max.y - min.y
       size = w < h ? h : w
-      
+
       @vertices.each_with_index do |v,i|
         n = pts[i]
         t = result[i]
@@ -256,7 +256,7 @@ module Geom
         t.u = ((n.x - min.x) / size) * size
         t.v = ((n.y - min.y) / size) * size
       end
-      
+
       result
     end
 

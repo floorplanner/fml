@@ -27,7 +27,7 @@ module Floorplanner
       v1 = Geom::Vertex.new(-width/2,0,0)
       v2 = Geom::Vertex.new( width/2,0,0)
       o_base = Geom::Edge.new(v1,v2)
-      
+
       # create opening side
       o_inner = o_base.offset(thickness/2.0,Wall3D::UP)
       o_outer = o_base.offset(-thickness/2.0,Wall3D::UP)
@@ -50,7 +50,7 @@ module Floorplanner
 
       # flip top cap
       extrusion.last.reverse
-      
+
       @meshes << @base
       @meshes.concat(extrusion)
 
@@ -131,7 +131,7 @@ module Floorplanner
       else
         rest.vertices.push(t2,ot,ob,b2)
       end
-      
+
       mesh.meshes.push(op_top)
       mesh.meshes.push(op_bot)
       mesh.meshes.push(rest)

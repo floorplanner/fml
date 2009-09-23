@@ -20,7 +20,7 @@ module Floorplanner
 
     def to_dae(xrefs=false)
       raise "No geometries to export. Call build_geometries first" unless @areas && @walls
-      @assets   = assets 
+      @assets   = assets
       @elements = objects
 
       # somehow...
@@ -73,7 +73,7 @@ module Floorplanner
           rotation = Geom::Number3D.from_str(rotation)
           rotation.z += 360 if rotation.z < 0
           rotation.z += 180
-          
+
           # find proper scale for object
           size     = object.find('size').first.content
           scale    = asset.scale_ratio(Geom::Number3D.from_str(size))

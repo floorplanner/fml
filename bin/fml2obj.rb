@@ -3,7 +3,7 @@ $: << File.join(File.dirname(__FILE__), "/../lib" )
 require 'floorplanner'
 
 if ARGV.length < 2
-  puts "\n  Usage: fml2dae.rb design_id path/to/fml" 
+  puts "\n  Usage: fml2dae.rb design_id path/to/fml"
 else
   doc = Floorplanner::Document.new(ARGV[1])
   doc.to_obj(ARGV[0],ARGV[2])

@@ -118,7 +118,7 @@ module Floorplanner
       old = @vertices.dup
       @vertices = Array.new
       old.each do |v|
-        @vertices.push(v) unless @vertices.include?(v) # find_vertex(@vertices,v) # 
+        @vertices.push(v) unless @vertices.include?(v) # find_vertex(@vertices,v) #
       end
       $stderr.puts "Walls Vertices: #{@vertices.length.to_s}"
       $stderr.puts "Walls Faces   : #{@faces.length.to_s}"

@@ -6,7 +6,7 @@ module Floorplanner
     LIBRARY_NODES        = '/COLLADA/library_nodes/node'
     LIBRARY_IMAGES       = '/COLLADA/library_images/image'
     VISUAL_SCENE_QUERY   = '/COLLADA/library_visual_scenes/visual_scene/node'
-    
+
     NO_NS_NAME = %w{ param }
 
     CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'kmz')
@@ -16,7 +16,7 @@ module Floorplanner
     def self.get(asset_id,asset_title,asset_url3d)
       FileUtils.mkdir_p(CACHE_PATH)
       asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset_url3d)
-      
+
       cached_path = File.join(CACHE_PATH,asset_id)
       if File.exists?(cached_path)
         $stderr.puts("Cached asset: %s" % asset_id)

@@ -2,7 +2,7 @@ module Floorplanner
   class AreaBuilder < Geom::TriangleMesh
 
     attr_reader :ceiling_z
-    
+
     def initialize(&block)
       super()
       @meshes = {}

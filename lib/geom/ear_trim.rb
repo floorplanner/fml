@@ -1,4 +1,4 @@
-# 
+#
 # Implements "Ear trimming" triangulation algorithm
 #
 module Geom
@@ -21,7 +21,7 @@ module Geom
         count += 1
 
         i = 0
-        while i < num 
+        while i < num
           j = (i+num-1) % num
           k = (i+1) % num
 

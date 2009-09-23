@@ -3,7 +3,7 @@ $: << File.join(File.dirname(__FILE__), "/../lib" )
 require 'floorplanner'
 
 if ARGV.length < 2
-  puts "\n  Usage: fml2dae.rb [-xrefs] design_id|design_name path/to/fml out.dae" 
+  puts "\n  Usage: fml2dae.rb [-xrefs] design_id|design_name path/to/fml out.dae"
 else
   xrefs = false
   if ARGV[0] == "-xrefs"

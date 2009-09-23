@@ -68,7 +68,7 @@ module Floorplanner
       @walls = WallBuilder.new do |b|
         @xml.find(LINES_QUERY % @design_id).each do |line|
           floats = line.find('points').first.get_floats
-          
+
           thickness = line.find('thickness').first.content.to_f
           height = line.find('height').first.content.to_f
 
@@ -95,7 +95,7 @@ module Floorplanner
         size_floats = opening.find('size').first.get_floats
         position = Geom::Number3D.new(*pos_floats)
         size     = Geom::Number3D.new(*size_floats)
-        
+
         asset_id = opening.find('asset').first.attributes['refid']
         asset    = @xml.find(ASSET_QUERY % [@design_id,asset_id]).first
         type     = asset.find('url2d').first.content.match(/door/i) ? Opening3D::TYPE_DOOR : Opening3D::TYPE_WINDOW

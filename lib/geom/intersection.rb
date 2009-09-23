@@ -23,7 +23,7 @@ module Geom
         # The lines intersect at a point somewhere
         ua = ((x4-x3)*(y1-y3)-(y4-y3)*(x1-x3)) / d
         ub = ((x2-x1)*(y1-y3)-(y2-y1)*(x1-x3)) / d
-        
+
         result.alpha.push(ua,ub)
         if infinite || ((ua > 0 && ua < 1) && (ub > 0 && ub < 1))
           x = x1 + ua*(x2-x1)

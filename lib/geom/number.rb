@@ -56,22 +56,22 @@ module Geom
     def distance_x(other)
       (@x - other.x).abs
     end
-    
+
     def distance_y(other)
       (@y - other.y).abs
     end
-    
+
     def distance_z(other)
       (@z - other.z).abs
     end
-    
+
     def distance(other)
       Math.sqrt(
         distance_z(other) ** 2 +
         Math.sqrt(distance_x(other)**2 + distance_y(other)**2) ** 2
       )
     end
-    
+
     def == (other)
       @x == other.x &&
       @y == other.y &&
@@ -90,7 +90,7 @@ module Geom
   class NumberUV
 
     attr_accessor :u, :v
-    
+
     def initialize(u=0,v=0)
       @u = u
       @v = v
