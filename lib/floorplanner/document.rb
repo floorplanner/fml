@@ -5,14 +5,14 @@ module Floorplanner
     LINE_POINTS_REGEXP = /^((\s*[-+]?[0-9]*\.?[0-9]+\s+){5,8}\s*[-+]?[0-9]*\.?[0-9]+\s*?(?:,)?)*$/
 
     def initialize(fml_fn)
-      @xml = XML::Document.file(fml_fn)
+      @xml = LibXML::XML::Document.file(fml_fn)
     end
 
     def self.validate(doc)
-      schema = XML::RelaxNG.document(
-        XML::Document.file(File.join(File.dirname(__FILE__), "..", "..", "xml", "fml.rng"))
+      schema = LibXML::XML::RelaxNG.document(
+        LibXML::XML::Document.file(File.join(File.dirname(__FILE__), "..", "..", "xml", "fml.rng"))
       )
-      doc = XML::Document.file(doc) if doc.instance_of?(String)
+      doc = LibXML::XML::Document.file(doc) if doc.instance_of?(String)
       doc.validate_relaxng(schema) do |message,error|
         # TODO throw an exception
         puts message if error
@@ -35,13 +35,13 @@ module Floorplanner
 
     def initialize(fml)
       if fml.kind_of? String # filename
-        @xml = XML::Document.file(fml)
-      elsif fml.kind_of? XML::Document
+        @xml = LibXML::XML::Document.file(fml)
+      elsif fml.kind_of? LibXML::XML::Document
         @xml = fml
       elsif fml.respond_to?(:read) # IO
-        @xml = XML::Document.io(fml)
+        @xml = LibXML::XML::Document.io(fml)
       else
-        raise ArgumentError.new("values must be one of: filename, IO, XML::Document")
+        raise ArgumentError.new("values must be one of: filename, IO, LibXML::XML::Document")
       end
     end
 
@@ -71,7 +71,7 @@ module Floorplanner
       if thumb_node = @xml.find_first('/design/thumb-2d-url')
         thumb_node.content = thumb_2d_url
       elsif design_node = @xml.find_first('/design')
-        thumb_node = XML::Node.new('thumb-2d-url')
+        thumb_node = LibXML::XML::Node.new('thumb-2d-url')
         thumb_node.content = thumb_2d_url
         design_node << thumb_node
       else
