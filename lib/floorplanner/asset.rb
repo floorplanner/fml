@@ -34,6 +34,9 @@ module Floorplanner
         asset.adjust_paths!
         asset
       end
+    rescue
+      $stderr.puts "Failed to get asset: %s, %s" % [asset_id, asset_url]
+      raise
     end
 
     def initialize(id,title,kmz)

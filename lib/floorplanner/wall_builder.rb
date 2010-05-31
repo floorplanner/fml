@@ -41,6 +41,7 @@ module Floorplanner
       @walls.each do |wall|
         if wall.outline.point_inside(position)
           wall.opening(position,size,type)
+          break
         end
       end
     end

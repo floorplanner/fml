@@ -1,32 +1,34 @@
 module Floorplanner
-  class Document
+  class DesignDocument
 
-    def to_dae(design_id,out_path,xrefs=false)
-      @design = Design.new(@xml,design_id)
+    def to_dae(out_path,conf={})
+      @design = Design.new(@xml)
       @design.build_geometries
-      @design.save_textures(File.dirname(out_path)) unless xrefs
+      unless conf[:xrefs]
+        @design.save_textures(File.dirname(out_path))
+      end
       dae = File.new(out_path,'w')
-      dae.write(@design.to_dae(xrefs))
+      dae.write(@design.to_dae(conf))
       dae.close
     end
 
   end
 
   module ColladaExport
-    DESIGN_QUERY   = "/project/floors/floor/designs/design[id='%s']"
+    DESIGN_QUERY   = "/design"
     ASSET_QUERY    = DESIGN_QUERY+"/assets/asset[@id='%s']"
     ASSETS_QUERY   = DESIGN_QUERY+"/assets/asset"
     OBJECTS_QUERY  = DESIGN_QUERY+"/objects/object"
 
-    def to_dae(xrefs=false)
-      raise "No geometries to export. Call build_geometries first" unless @areas && @walls
+    def to_dae(conf)
+      raise "No geometries to export" unless @areas && @walls
       @assets   = assets
       @elements = objects
 
       # somehow...
       @walls.reverse
       @areas.each {|a| a.reverse}
-      @xrefs = xrefs
+      @conf = conf
 
       template = ERB.new(
         File.read(
@@ -37,12 +39,14 @@ module Floorplanner
     def assets
       return @assets if @assets
       @assets = {}
-      @xml.find(ASSETS_QUERY % @design_id).each do |asset_node|
+      @xml.find(ASSETS_QUERY).each do |asset_node|
         asset_id = asset_node.attributes['id']
-        name  = asset_node.find('name').first.content
+        name  = asset_node.find('name').first
+        name  = name.content if name
         url3d = asset_node.find('url3d').first
         next unless url3d
         url3d = url3d.content
+        next if url3d.empty?
 
         # TODO: store asset bounding box
         asset = Floorplanner::Asset.get(asset_id,name,url3d)
@@ -54,7 +58,7 @@ module Floorplanner
 
     def objects
       result = []
-      @xml.find(OBJECTS_QUERY % @design_id).each do |object|
+      @xml.find(OBJECTS_QUERY).each do |object|
         begin
           refid = object.find('asset').first.attributes['refid']
           next unless assets[refid]
@@ -81,7 +85,7 @@ module Floorplanner
           mirrored = object.find('mirrored').first
           reflection = Geom::Matrix3D.reflection(Geom::Plane.new(Geom::Number3D.new(0.0,1.0,0.0), Geom::Number3D.new))
           if mirrored
-            mirror   = Geom::Number3D.from_str(mirrored)
+            mirror   = Geom::Number3D.from_str(mirrored.content)
             if mirror.x != 0 || mirror.y != 0 || mirror.z != 0
               mirror.x = mirror.x > 0 ? 1 : 0
               mirror.y = mirror.y > 0 ? 1 : 0
@@ -101,7 +105,7 @@ module Floorplanner
             :matrix   => reflection
           }
         rescue
-          # TODO: handle text
+          $stderr.puts "Error of object asset##{refid} - #{$!}"
         end
       end
       result

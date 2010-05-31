@@ -124,30 +124,26 @@ module Geom
     end
 
     def point_inside(pt)
-      x = "x"
-      y = "y"
-      n = @vertices.length
-      dominant = dominant_axis
-      dist = self.plane.distance(pt)
-      result = false
+      x = pt.x;
+      y = pt.y;
+      c = false;
+      length = @vertices.length
+      
+      length.times do |i|
+        j = (i+1) % length
 
-      return false if dist.abs > 0.01
-      case dominant
-      when AXIS_X
-        x = "y"
-        y = "z"
-      when AXIS_Y
-        y = "z"
-      end
+        a = @vertices[i]
+        b = @vertices[j]
 
-      @vertices.each_with_index do |v,i|
-        vn = @vertices[(i+1)%n] # next
-        if (((v.send(y) <= pt.send(y)) && (pt.send(y) < vn.send(y))) || ((vn.send(y) <= pt.send(y)) && (pt.send(y) < v.send(y)))) &&
-            (pt.send(x) < (vn.send(x) - v.send(x)) * (pt.send(y) - v.send(y)) / (vn.send(y) - v.send(y)) + v.send(x))
-          result = !result
+        xpi = a.x
+        ypi = a.y
+        xpj = b.x
+        ypj = b.y
+        if ((((ypi<=y) && (y<ypj)) || ((ypj<=y) && (y<ypi))) && (x < (xpj-xpi)*(y-ypi)/(ypj-ypi)+xpi))
+          c = !c
         end
       end
-      result
+      return c;      
     end
 
     def winding

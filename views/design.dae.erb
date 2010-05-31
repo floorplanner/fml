@@ -36,7 +36,7 @@
         <instance_effect url="#area_<%= area_mesh.data[:id] %>-fx"/>
       </material>
     <% end %>
-    <% unless @xrefs; @assets.each_value do |asset| %>
+    <% unless @conf[:xrefs]; @assets.each_value do |asset| %>
       <% asset.library_materials.each do |materials| %>
         <%= materials.to_s %>
       <% end %>
@@ -174,7 +174,7 @@
         </profile_COMMON>
       </effect>
     <% end %>
-    <% unless @xrefs; @assets.each_value do |asset| %>
+    <% unless @conf[:xrefs]; @assets.each_value do |asset| %>
       <% asset.library_effects.each do |effects| %>
         <%= effects.to_s %>
       <% end %>
@@ -189,7 +189,7 @@
     </image>
     <% end; end %>
 
-    <% unless @xrefs; @assets.each_value do |asset| %>
+    <% unless @conf[:xrefs]; @assets.each_value do |asset| %>
       <% asset.library_images.each do |image| %>
         <%= image.to_s %>
       <% end %>
@@ -282,11 +282,11 @@
           </source>
 
           <source id="area_<%= id %>-uvs" name="texcoord">
-            <float_array id="area_<%= id %>-uvs-array" count="<%= area_mesh.texcoord.length %>">
+            <float_array id="area_<%= id %>-uvs-array" count="<%= area_mesh.texcoord.length*2 %>">
               <%= area_mesh.texcoord.map{|n| [n.u,n.v]}.flatten.join(' ') %>
             </float_array>
             <technique_common>
-              <accessor count="44" source="#area_<%= id %>-uvs-array" stride="2">
+              <accessor count="<%= area_mesh.texcoord.length %>" source="#area_<%= id %>-uvs-array" stride="2">
                 <param name="S" type="float"/>
                 <param name="T" type="float"/>
               </accessor>
@@ -313,13 +313,13 @@
         </mesh>
       </geometry>
     <% end %>
-    <% unless @xrefs; @assets.each_value do |asset| %>
+    <% unless @conf[:xrefs]; @assets.each_value do |asset| %>
       <% asset.library_geometries.each do |geometries| %>
         <%= geometries.to_s %>
       <% end %>
     <% end; end %>
   </library_geometries>
-  <% unless @xrefs %>
+  <% unless @conf[:xrefs] %>
   <library_nodes>
     <% @assets.each_value do |asset| %>
       <% asset.library_nodes.each do |nodes| %>
@@ -394,7 +394,7 @@
               </bind_material>
             </instance_geometry>
           </node>
-          <% if area_mesh.data[:type] == 'generated_area' %>
+          <% if @conf[:ceiling] && area_mesh.data[:type] == 'generated_area' %>
             <node id="Area_<%= id %>-cap" name="Area_<%= id %>-cap">
               <translate>0.0 0.0 <%= @areas.ceiling_z %></translate>
               <instance_geometry url="#area_<%= id %>-geom">
@@ -424,7 +424,7 @@
             <rotate sid="rotateZ">0 0 1 <%= element[:rotation].z %></rotate>
           <% end %>
           <scale><%= element[:scale].to_floats %></scale>
-          <% if @xrefs %>
+          <% if @conf[:xrefs] %>
             <instance_node url="<%= element[:asset].dae_path %>"/>
           <% else %>
             <%= element[:asset].visual_scene_node.to_s  %>

@@ -8,20 +8,21 @@ module Floorplanner
 
     def initialize(baseline,thickness,opening)
       super()
+      base_z    = opening[:position].z
       @position = baseline.snap(opening[:position])
       @type     = opening[:type]
+      @size     = opening[:size]
       dir = baseline.direction
       angle  = Math.atan2(dir.y,dir.x)
       width  = opening[:size].x
-      height = 0
 
       case @type
       when TYPE_DOOR
         @position.z = 0.01
-        height = Floorplanner.config['openings']['door_height']
+        height = @size.z # Floorplanner.config['openings']['door_height']
       else
-        @position.z = Floorplanner.config['openings']['window_base']
-        height = Floorplanner.config['openings']['window_height']
+        @position.z = base_z # Floorplanner.config['openings']['window_base']
+        height = @size.z # Floorplanner.config['openings']['window_height']
       end
 
       v1 = Geom::Vertex.new(-width/2,0,0)
