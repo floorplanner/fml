@@ -18,17 +18,6 @@ module Floorplanner
         puts message if error
       end
     end
-
-  private
-
-    def self.validate_line_points(doc)
-      doc.find(POINTS_QUERY).each do |points_node|
-        unless LINE_POINTS_REGEXP =~ points_node.children.to_s
-          # TODO throw an exception
-          puts "Elements points inside area's line failed to validate content."
-        end
-      end
-    end
   end
 
   class DesignDocument

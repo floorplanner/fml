@@ -1,5 +1,5 @@
 module Floorplanner
-  class Asset
+  class DAE
     LIBRARY_GEOMETRIES   = '/COLLADA/library_geometries/geometry'
     LIBRARY_EFFECTS      = '/COLLADA/library_effects/effect'
     LIBRARY_MATERIALS    = '/COLLADA/library_materials/material'
@@ -21,7 +21,7 @@ module Floorplanner
       if File.exists?(cached_path)
         $stderr.puts("Cached asset: %s" % asset_id)
         @kmz = Keyhole::Archive.new(cached_path)
-        Asset.new(asset_id,asset_title,@kmz)
+        DAE.new(asset_id,asset_title,@kmz)
       else
         $stderr.puts("Downloading asset: %s" % asset_url)
         cached = File.new(cached_path,'w')
@@ -30,7 +30,7 @@ module Floorplanner
         cached.close
 
         @kmz = Keyhole::Archive.new(cached_path)
-        asset = Asset.new(asset_id,asset_title,@kmz)
+        asset = DAE.new(asset_id,asset_title,@kmz)
         asset.adjust_paths!
         asset
       end

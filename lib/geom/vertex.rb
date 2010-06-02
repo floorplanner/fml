@@ -12,6 +12,14 @@ module Geom
       @normal = normal
     end
 
+    def hash
+      @position.hash
+    end
+
+    def eql?(other)
+      self == other
+    end
+
     def == (other)
       @position == other.position
     end

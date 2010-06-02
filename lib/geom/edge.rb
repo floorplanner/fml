@@ -22,7 +22,7 @@ module Geom
       edge = clone
       dir  = direction
 
-      Matrix3D.multiply_vector_3x3(Matrix3D.rotation_matrix(up.x,up.y,up.z, -Math::PI/2),dir)
+      Matrix3D.multiply_vector_3x3(Matrix3D.rotation(up.x,up.y,up.z, -Math::PI/2),dir)
       dir.normalize
 
       dir.x *= distance

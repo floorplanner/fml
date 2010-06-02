@@ -49,7 +49,7 @@ module Floorplanner
         next if url3d.empty?
 
         # TODO: store asset bounding box
-        asset = Floorplanner::Asset.get(asset_id,name,url3d)
+        asset = Floorplanner::DAE.get(asset_id,name,url3d)
         next unless asset
         @assets.store(asset_id, asset)
       end
@@ -63,10 +63,9 @@ module Floorplanner
           refid = object.find('asset').first.attributes['refid']
           next unless assets[refid]
 
-          asset    = assets[refid]
-          position = Geom::Number3D.from_str(object.find('points').first.content)
-          # correct Flash axis issues
-          position.y *= -1.0
+          asset = assets[refid]
+          pos = Geom::Number3D.from_str(object.find('points').first.content)
+          pos.y *= -1.0 # correct Flash axis issues
 
           # correct Flash rotation issues
           rotation = unless object.find('rotation').empty?
@@ -74,18 +73,18 @@ module Floorplanner
           else
             '0 0 0'
           end
-          rotation = Geom::Number3D.from_str(rotation)
-          rotation.z += 360 if rotation.z < 0
-          rotation.z += 180
+          rot = Geom::Number3D.from_str(rotation)
+          rot.z += 360 if rot.z < 0
+          rot.z += 180
 
           # find proper scale for object
           size     = object.find('size').first.content
           scale    = asset.scale_ratio(Geom::Number3D.from_str(size))
-
+          
           mirrored = object.find('mirrored').first
           reflection = Geom::Matrix3D.reflection(Geom::Plane.new(Geom::Number3D.new(0.0,1.0,0.0), Geom::Number3D.new))
           if mirrored
-            mirror   = Geom::Number3D.from_str(mirrored.content)
+            mirror = Geom::Number3D.from_str(mirrored.content)
             if mirror.x != 0 || mirror.y != 0 || mirror.z != 0
               mirror.x = mirror.x > 0 ? 1 : 0
               mirror.y = mirror.y > 0 ? 1 : 0
@@ -93,16 +92,21 @@ module Floorplanner
 
               origin = Geom::Number3D.new
               plane  = Geom::Plane.new(mirror,origin)
-              reflection = Geom::Matrix3D.reflection(plane).multiply reflection
+              m_reflection = Geom::Matrix3D.reflection(plane) * reflection
             end
           end
 
+          m_scale     = Geom::Matrix3D.scale(scale.x, scale.y, scale.z)
+          m_translate = Geom::Matrix3D.translation(pos.x, pos.y, pos.z)
+          m_rotate    = Geom::Matrix3D.rotation(0, 0, 1, (Math::PI/180)*rot.z)
+
+          m_combined  = m_scale * m_rotate
+          m_combined  = m_reflection * m_combined if m_reflection
+          m_combined  = m_translate * m_combined
+
           result << {
-            :asset => asset,
-            :position => position,
-            :rotation => rotation,
-            :scale    => scale,
-            :matrix   => reflection
+            :asset  => asset,
+            :matrix => m_combined
           }
         rescue
           $stderr.puts "Error of object asset##{refid} - #{$!}"

@@ -7,6 +7,7 @@ require 'fileutils'
 
 require 'rubygems'
 require 'zip/zip'
+require 'roxml'
 require 'xml'
 
 $LOAD_PATH.push(File.dirname(__FILE__))
@@ -30,6 +31,7 @@ module XML
 end
 
 require 'geom'
+require 'floorplanner/xml'
 require 'floorplanner/asset'
 require 'floorplanner/document'
 require 'floorplanner/collada_export'

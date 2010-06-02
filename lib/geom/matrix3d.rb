@@ -9,7 +9,7 @@ module Geom
       ]
     end
 
-    def self.rotation_matrix(x,y,z,rad)
+    def self.rotation(x,y,z,rad)
       n_cos = Math.cos(rad)
       n_sin = Math.sin(rad)
       s_cos = 1 - n_cos
@@ -111,6 +111,10 @@ module Geom
       v.z = vx * ma[2][0] + vy * ma[2][1] + vz * ma[2][2]
     end
 
+    def *(other)
+      multiply(other)
+    end
+
     def multiply(other)
       # matrix multiplication is m[r][c] = (row[r]).(col[c])
       s = to_a
@@ -133,7 +137,8 @@ module Geom
       Matrix3D[
         [rm00, rm01, rm02, rm03],
         [rm10, rm11, rm12, rm13],
-        [rm20, rm21, rm22, rm23]
+        [rm20, rm21, rm22, rm23],
+        [   0,    0,    0,    1]
       ]
     end
 

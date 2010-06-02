@@ -410,20 +410,9 @@
       </node>
       <% @elements.each do |element| %>
         <node name="<%= element[:asset].title %>">
-          <translate><%= element[:position].to_floats %></translate>
           <% if element[:matrix] %>
             <matrix><%= element[:matrix].to_a.join ' ' %></matrix>
           <% end %>
-          <% if element[:rotation].x > 0 %>
-            <rotate sid="rotateX">1 0 0 <%= element[:rotation].x %></rotate>
-          <% end %>
-          <% if element[:rotation].y > 0 %>
-            <rotate sid="rotateY">0 1 0 <%= element[:rotation].y %></rotate>
-          <% end %>
-          <% if element[:rotation].z > 0 %>
-            <rotate sid="rotateZ">0 0 1 <%= element[:rotation].z %></rotate>
-          <% end %>
-          <scale><%= element[:scale].to_floats %></scale>
           <% if @conf[:xrefs] %>
             <instance_node url="<%= element[:asset].dae_path %>"/>
           <% else %>

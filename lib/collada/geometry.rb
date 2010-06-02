@@ -90,7 +90,7 @@ module Collada
           result = result.multiply(t)
         when "rotate"
           f = child.get_floats
-          t = Geom::Matrix3D.rotation_matrix(f[0],f[1],f[2],f[3])
+          t = Geom::Matrix3D.rotation(f[0],f[1],f[2],f[3])
           result = result.multiply(t)
         when "matrix"
           f = child.get_floats
