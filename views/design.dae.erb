@@ -79,6 +79,7 @@
         </technique>
       </profile_COMMON>
     </effect>
+    <% if @conf[:window_glass] %>
     <effect id="windows-fx">
       <profile_COMMON>
         <technique>
@@ -114,6 +115,7 @@
         </technique>
       </profile_COMMON>
     </effect>
+    <% end %>
     <% @areas.each do |area_mesh|; id = area_mesh.data[:id].to_s %>
       <effect id="area_<%= id %>-fx" name="<%= area_mesh.data[:name] %>">
         <% if area_mesh.data[:texture] %>
@@ -124,18 +126,6 @@
           </extra>
         <% end %>
         <profile_COMMON>
-          <% if area_mesh.data[:texture] %>
-          <newparam sid="area_<%= id %>-surface">
-              <surface type="2D">
-                <init_from>area_<%= id %>-image</init_from>
-              </surface>
-          </newparam>
-          <newparam sid="area_<%= id %>-sampler">
-              <sampler2D>
-                <source>area_<%= id %>-surface</source>
-              </sampler2D>
-          </newparam>
-          <% end %>
           <technique>
             <phong>
               <emission>
@@ -145,11 +135,7 @@
                 <color>0.1 0.1 0.1 1</color>
               </ambient>
               <diffuse>
-                <% if area_mesh.data[:texture] %>
-                <texture texture="area_<%= id %>-sampler"/>
-                <% else %>
                 <color><%= area_mesh.data[:color].join(' ') %> 1</color>
-                <% end %>
               </diffuse>
               <specular>
                 <color>0 0 0 1</color>
@@ -182,13 +168,6 @@
   </library_effects>
 
   <library_images>
-    <% @areas.each do |area_mesh|; if area_mesh.data[:texture] %>
-    <image id="area_<%= area_mesh.data[:id] %>-image" name="<%= area_mesh.data[:name] %>">
-    <init_from><%= Floorplanner.config['area_textures_path'] + 
-                   area_mesh.data[:texture].gsub('textures/2d/','').gsub(/\.swf$/,'.png') %></init_from>
-    </image>
-    <% end; end %>
-
     <% unless @conf[:xrefs]; @assets.each_value do |asset| %>
       <% asset.library_images.each do |image| %>
         <%= image.to_s %>
@@ -227,6 +206,7 @@
       </mesh>
     </geometry>
 
+    <% if @conf[:window_glass] %>
     <geometry id="windows-geom" name="WindowsGeometry">
     <%
       windows_vertices = @walls.windows.collect {|w| w.vertices}.flatten
@@ -263,6 +243,8 @@
         </triangles>
       </mesh>
     </geometry>
+    <% end %>
+
     <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
     <geometry id="area_<%= id %>-geom" name="Area_<%= id %>_<%= area_mesh.data[:name] %>-Geometry">
         <mesh>
@@ -374,6 +356,8 @@
           </bind_material>
         </instance_geometry>
       </node>
+
+      <% if @conf[:window_glass] %>
       <node id="Windows" name="Windows">
         <instance_geometry url="#windows-geom">
           <bind_material>
@@ -383,6 +367,8 @@
           </bind_material>
         </instance_geometry>
       </node>
+      <% end %>
+
       <node id="Areas" name="Areas">
         <% @areas.each do |area_mesh|; id = area_mesh.data[:id] %>
           <node id="Area_<%= id %>" name="Area_<%= id %>">
@@ -410,9 +396,7 @@
       </node>
       <% @elements.each do |element| %>
         <node name="<%= element[:asset].title %>">
-          <% if element[:matrix] %>
-            <matrix><%= element[:matrix].to_a.join ' ' %></matrix>
-          <% end %>
+          <matrix><%= element[:matrix].to_a.join ' ' %></matrix>
           <% if @conf[:xrefs] %>
             <instance_node url="<%= element[:asset].dae_path %>"/>
           <% else %>

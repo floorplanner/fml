@@ -68,40 +68,31 @@ module Floorplanner
           pos.y *= -1.0 # correct Flash axis issues
 
           # correct Flash rotation issues
-          rotation = unless object.find('rotation').empty?
-            object.find('rotation').first.content
+          rot = object.find('rotation').first
+          if rot
+            rot = Geom::Number3D.from_str(rot.content)
+            rot.z *= -1
           else
-            '0 0 0'
+            rot = Geom::Number3D.new
           end
-          rot = Geom::Number3D.from_str(rotation)
-          rot.z += 360 if rot.z < 0
-          rot.z += 180
 
           # find proper scale for object
           size     = object.find('size').first.content
           scale    = asset.scale_ratio(Geom::Number3D.from_str(size))
-          
-          mirrored = object.find('mirrored').first
-          reflection = Geom::Matrix3D.reflection(Geom::Plane.new(Geom::Number3D.new(0.0,1.0,0.0), Geom::Number3D.new))
-          if mirrored
-            mirror = Geom::Number3D.from_str(mirrored.content)
-            if mirror.x != 0 || mirror.y != 0 || mirror.z != 0
-              mirror.x = mirror.x > 0 ? 1 : 0
-              mirror.y = mirror.y > 0 ? 1 : 0
-              mirror.z = mirror.z > 0 ? 1 : 0
 
-              origin = Geom::Number3D.new
-              plane  = Geom::Plane.new(mirror,origin)
-              m_reflection = Geom::Matrix3D.reflection(plane) * reflection
-            end
+          mirrored = object.find('mirrored').first
+          if mirrored
+            m_mirror = Geom::Matrix3D.reflection(
+              Geom::Plane.new(Geom::Number3D.from_str(mirrored.content),
+                Geom::Number3D.new))
           end
 
           m_scale     = Geom::Matrix3D.scale(scale.x, scale.y, scale.z)
-          m_translate = Geom::Matrix3D.translation(pos.x, pos.y, pos.z)
           m_rotate    = Geom::Matrix3D.rotation(0, 0, 1, (Math::PI/180)*rot.z)
+          m_translate = Geom::Matrix3D.translation(pos.x, pos.y, pos.z)
 
-          m_combined  = m_scale * m_rotate
-          m_combined  = m_reflection * m_combined if m_reflection
+          m_combined  = m_rotate * m_scale
+          m_combined  = m_mirror * m_combined if m_mirror
           m_combined  = m_translate * m_combined
 
           result << {
