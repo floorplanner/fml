@@ -1,8 +1,8 @@
-module Floorplanner
-  class DesignDocument
+module Floorplanner::XML
+  class Document
 
     def to_dae(out_path,conf={})
-      @design = Design.new(@xml)
+      @design = Floorplanner::Design.new(self)
       @design.build_geometries
       unless conf[:xrefs]
         @design.save_textures(File.dirname(out_path))
@@ -11,10 +11,12 @@ module Floorplanner
       dae.write(@design.to_dae(conf))
       dae.close
     end
-
   end
+end
 
+module Floorplanner
   module ColladaExport
+
     DESIGN_QUERY   = "/design"
     ASSET_QUERY    = DESIGN_QUERY+"/assets/asset[@id='%s']"
     ASSETS_QUERY   = DESIGN_QUERY+"/assets/asset"
@@ -39,52 +41,31 @@ module Floorplanner
     def assets
       return @assets if @assets
       @assets = {}
-      @xml.find(ASSETS_QUERY).each do |asset_node|
-        asset_id = asset_node.attributes['id']
-        name  = asset_node.find('name').first
-        name  = name.content if name
-        url3d = asset_node.find('url3d').first
-        next unless url3d
-        url3d = url3d.content
-        next if url3d.empty?
+      @doc.assets.each do |asset|
+        next unless asset.url3d && !asset.url3d.empty?
 
         # TODO: store asset bounding box
-        asset = Floorplanner::DAE.get(asset_id,name,url3d)
-        next unless asset
-        @assets.store(asset_id, asset)
+        dae = Floorplanner::DAE.get(asset)
+        next unless dae
+        @assets.store(asset.id, dae)
       end
       @assets
     end
 
     def objects
       result = []
-      @xml.find(OBJECTS_QUERY).each do |object|
+      @doc.objects.each do |item|
         begin
-          refid = object.find('asset').first.attributes['refid']
-          next unless assets[refid]
+          next unless assets[item.asset]
+          asset = assets[item.asset]
 
-          asset = assets[refid]
-          pos = Geom::Number3D.from_str(object.find('points').first.content)
-          pos.y *= -1.0 # correct Flash axis issues
+          pos = item.position
+          rot = item.rotation || Geom::Number3D.new
+          scale = asset.scale_ratio(item.size)
 
-          # correct Flash rotation issues
-          rot = object.find('rotation').first
-          if rot
-            rot = Geom::Number3D.from_str(rot.content)
-            rot.z *= -1
-          else
-            rot = Geom::Number3D.new
-          end
-
-          # find proper scale for object
-          size     = object.find('size').first.content
-          scale    = asset.scale_ratio(Geom::Number3D.from_str(size))
-
-          mirrored = object.find('mirrored').first
-          if mirrored
+          if item.mirrored
             m_mirror = Geom::Matrix3D.reflection(
-              Geom::Plane.new(Geom::Number3D.from_str(mirrored.content),
-                Geom::Number3D.new))
+              Geom::Plane.new(item.mirrored, Geom::Number3D.new))
           end
 
           m_scale     = Geom::Matrix3D.scale(scale.x, scale.y, scale.z)
@@ -100,7 +81,7 @@ module Floorplanner
             :matrix => m_combined
           }
         rescue
-          $stderr.puts "Error of object asset##{refid} - #{$!}"
+          $stderr.puts "Error of object asset##{asset.id} - #{$!}"
         end
       end
       result

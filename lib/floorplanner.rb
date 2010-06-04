@@ -7,8 +7,8 @@ require 'fileutils'
 
 require 'rubygems'
 require 'zip/zip'
+require 'libxml'
 require 'roxml'
-require 'xml'
 
 $LOAD_PATH.push(File.dirname(__FILE__))
 
@@ -22,7 +22,7 @@ module Floorplanner
   end
 end
 
-module XML
+module LibXML::XML
   class Node
     def get_floats
       content.split(/\s|,/).delete_if {|s| s.empty?}.map! {|f| f.to_f}
@@ -35,8 +35,6 @@ require 'floorplanner/xml'
 require 'floorplanner/asset'
 require 'floorplanner/document'
 require 'floorplanner/collada_export'
-require 'floorplanner/rib_export'
-require 'floorplanner/obj_export'
 require 'floorplanner/svg_export'
 require 'floorplanner/design'
 require 'floorplanner/wall3d'

@@ -1,7 +1,7 @@
 require 'cgi'
 
 module Collada
-  class Document < XML::Document
+  class Document < LibXML::XML::Document
     XMLNS = "http://www.collada.org/2005/11/COLLADASchema"
     VERSION = "1.4.1"
 
@@ -19,8 +19,8 @@ module Collada
 
     def initialize
       super
-      self.root = XML::Node.new(COLLADA)
-      self.root.namespaces.namespace = XML::Namespace.new(self.root,nil,XMLNS)
+      self.root = LibXML::XML::Node.new(COLLADA)
+      self.root.namespaces.namespace = LibXML::XML::Namespace.new(self.root,nil,XMLNS)
       self.root.attributes['version'] = VERSION
 
       create_structure
@@ -51,18 +51,18 @@ module Collada
 
     private
       def create_structure
-        self << XML::Node.new(ASSET)
+        self << LibXML::XML::Node.new(ASSET)
 
-        self << XML::Node.new(LIBRARY_MATERIALS)
-        self << XML::Node.new(LIBRARY_EFFECTS)
-        self << XML::Node.new(LIBRARY_GEOMETRIES)
-        self << (visual_scenes = XML::Node.new(LIBRARY_VISUAL_SCENES))
-        visual_scenes << (visual_scene = XML::Node.new(VISUAL_SCENE))
+        self << LibXML::XML::Node.new(LIBRARY_MATERIALS)
+        self << LibXML::XML::Node.new(LIBRARY_EFFECTS)
+        self << LibXML::XML::Node.new(LIBRARY_GEOMETRIES)
+        self << (visual_scenes = LibXML::XML::Node.new(LIBRARY_VISUAL_SCENES))
+        visual_scenes << (visual_scene = LibXML::XML::Node.new(VISUAL_SCENE))
         visual_scene['id'] = 'MainScene'
         visual_scene['name'] = 'MainScene'
 
-        self << (scene = XML::Node.new(SCENE))
-        scene << (scene_node = XML::Node.new(INSTANCE_VISUAL_SCENE))
+        self << (scene = LibXML::XML::Node.new(SCENE))
+        scene << (scene_node = LibXML::XML::Node.new(INSTANCE_VISUAL_SCENE))
         scene_node['url'] = '#MainScene'
       end
 

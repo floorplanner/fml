@@ -13,15 +13,15 @@ module Floorplanner
 
     attr_reader :id, :name, :title, :dae_path
 
-    def self.get(asset_id,asset_title,asset_url3d)
+    def self.get(asset)
       FileUtils.mkdir_p(CACHE_PATH)
-      asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset_url3d)
+      asset_url = Floorplanner.config['content_base_url'] + URI.escape(asset.url3d)
 
-      cached_path = File.join(CACHE_PATH,asset_id)
+      cached_path = File.join(CACHE_PATH, asset.id)
       if File.exists?(cached_path)
-        $stderr.puts("Cached asset: %s" % asset_id)
+        $stderr.puts("Cached asset: %s" % asset.id)
         @kmz = Keyhole::Archive.new(cached_path)
-        DAE.new(asset_id,asset_title,@kmz)
+        DAE.new(asset.id, asset.name, @kmz)
       else
         $stderr.puts("Downloading asset: %s" % asset_url)
         cached = File.new(cached_path,'w')
@@ -30,21 +30,21 @@ module Floorplanner
         cached.close
 
         @kmz = Keyhole::Archive.new(cached_path)
-        asset = DAE.new(asset_id,asset_title,@kmz)
-        asset.adjust_paths!
-        asset
+        dae = DAE.new(asset.id, asset.name, @kmz)
+        dae.adjust_paths!
+        dae
       end
     rescue
-      $stderr.puts "Failed to get asset: %s, %s" % [asset_id, asset_url]
+      $stderr.puts "Failed to get asset: %s, %s" % [asset.id, asset_url]
       raise
     end
 
-    def initialize(id,title,kmz)
+    def initialize(id, title, kmz)
       @dae_path = kmz.dae_path(id)
       @kmz   = kmz
       @id    = id
       @title = title
-      @xml   = XML::Document.string(File.read(@dae_path).gsub(/xmlns=".+"/, ''))
+      @xml   = LibXML::XML::Document.string(File.read(@dae_path).gsub(/xmlns=".+"/, ''))
       @name  = File.basename(@dae_path.gsub(/\.|dae/,''))
       @images_dict = {}
     end

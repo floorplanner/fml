@@ -15,6 +15,6 @@ else
     ARGV.shift
     conf[:xrefs] = true
   end
-  doc = Floorplanner::DesignDocument.new(ARGV[0])
+  doc = Floorplanner::XML::Document.from_xml(open(ARGV[0]))
   doc.to_dae(ARGV[1], conf)
 end

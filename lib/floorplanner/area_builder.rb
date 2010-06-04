@@ -23,7 +23,7 @@ module Floorplanner
 
     HEX_RE = "(?i:[a-f\\d])"
     def area(vertices,params=nil)
-      a_id = vertices.hash.abs.to_s + "_" +params[:type]
+      a_id = vertices.hash.abs.to_s + "_" +params[:type].to_s
       if params[:color] =~ /\A#((?:#{HEX_RE}{2,2}){3,4})\z/
          params[:color] = [*$1.scan(/.{2,2}/).collect {|value| value.hex / 255.0}]
       else
