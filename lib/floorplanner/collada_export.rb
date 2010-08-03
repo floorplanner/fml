@@ -95,7 +95,8 @@ module Floorplanner
       FileUtils.mkdir_p t2d_path
       @areas.each do |area|
         next unless area.data[:texture]
-        fn = area.data[:texture].match(/.*\/(.*)/)[1]
+        texture_url = area.data[:texture]
+        fn = texture_url.match(/.*\/(.*)/)[1]
         tex_path = File.join(t2d_path, fn)
         area.data[:texture] = File.join('textures', 'textures_2d', fn)
         next if File.exists?(tex_path)
@@ -103,11 +104,11 @@ module Floorplanner
         FileUtils.mkdir_p CACHE_PATH
         cached_path = File.join(CACHE_PATH, fn)
         unless File.exists?(cached_path)
-          puts "Downloading texture: %s" % fn
+          puts "Downloading texture: %s" % texture_url
           begin
             cached = File.new(cached_path, 'w')
             remote = open(Floorplanner.config['content_base_url'] + 
-              URI.escape(area.data[:texture]))
+              URI.escape(texture_url))
             cached.write(remote.read)
             cached.close
           rescue
