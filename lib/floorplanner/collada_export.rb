@@ -17,10 +17,7 @@ end
 module Floorplanner
   module ColladaExport
 
-    DESIGN_QUERY   = "/design"
-    ASSET_QUERY    = DESIGN_QUERY+"/assets/asset[@id='%s']"
-    ASSETS_QUERY   = DESIGN_QUERY+"/assets/asset"
-    OBJECTS_QUERY  = DESIGN_QUERY+"/objects/object"
+    CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'textures_2d')
 
     def to_dae(conf)
       raise "No geometries to export" unless @areas && @walls
@@ -88,10 +85,36 @@ module Floorplanner
     end
 
     def save_textures(root_path)
-      img_path = File.join(root_path,'textures')
+      img_path = File.join(root_path, 'textures')
       FileUtils.mkdir_p img_path
       assets.each_value do |asset|
         asset.save_textures img_path
+      end
+
+      t2d_path = File.join(img_path, 'textures_2d')
+      FileUtils.mkdir_p t2d_path
+      @areas.each do |area|
+        next unless area.data[:texture]
+        fn = area.data[:texture].match(/.*\/(.*)/)[1]
+        tex_path = File.join(t2d_path, fn)
+        area.data[:texture] = File.join('textures', 'textures_2d', fn)
+        next if File.exists?(tex_path)
+
+        FileUtils.mkdir_p CACHE_PATH
+        cached_path = File.join(CACHE_PATH, fn)
+        unless File.exists?(cached_path)
+          puts "Downloading texture: %s" % fn
+          begin
+            cached = File.new(cached_path, 'w')
+            remote = open(Floorplanner.config['content_base_url'] + 
+              URI.escape(area.data[:texture]))
+            cached.write(remote.read)
+            cached.close
+          rescue
+            $stderr.puts "Error downloading texture: %s" % fn
+          end
+        end
+        FileUtils.cp(cached_path, tex_path)
       end
     end
   end

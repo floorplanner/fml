@@ -5,8 +5,12 @@ module Floorplanner::XML
 
     xml_accessor :id, :from => :attr
     xml_accessor :name
-    xml_accessor :url2d
+    xml_accessor :url2d_str, :from => 'url2d'
     xml_accessor :url3d
+
+    def url2d
+      url2d_str.match(/swf$/) ? url2d_str.gsub(/swf$/, 'png') : url2d_str
+    end
   end
 
   class Line
@@ -41,11 +45,11 @@ module Floorplanner::XML
   class Area
     include ROXML
 
-    xml_accessor :type_str
     xml_accessor :points
     xml_accessor :color
     xml_accessor :name
     xml_accessor :asset, :from => 'asset/@refid'
+    xml_accessor :type_str, :from => 'type'
 
     def type
       type_str.to_sym if type_str

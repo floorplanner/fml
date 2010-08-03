@@ -16,8 +16,6 @@
         <technique_common>
           <perspective>
             <yfov>70</yfov>
-            <znear>0.1</znear>
-            <zfar>100.0</zfar>
           </perspective>
         </technique_common>
       </optics>
@@ -126,6 +124,18 @@
           </extra>
         <% end %>
         <profile_COMMON>
+        <% if area_mesh.data[:texture] %>
+          <newparam sid="area_<%= id %>-surface">
+            <surface type="2D">
+              <init_from>area_<%= id %>-image</init_from>
+            </surface>
+          </newparam>
+          <newparam sid="area_<%= id %>-sampler">
+            <sampler2D>
+              <source>area_<%= id %>-surface</source>
+            </sampler2D>
+          </newparam>
+        <% end %>
           <technique>
             <phong>
               <emission>
@@ -135,7 +145,11 @@
                 <color>0.1 0.1 0.1 1</color>
               </ambient>
               <diffuse>
+              <% if area_mesh.data[:texture] %>
+                <texture texture="area_<%= id %>-sampler" texcoord="TEXCOORD" />
+              <% else %>
                 <color><%= area_mesh.data[:color].join(' ') %> 1</color>
+              <% end %>
               </diffuse>
               <specular>
                 <color>0 0 0 1</color>
@@ -173,6 +187,11 @@
         <%= image.to_s %>
       <% end %>
     <% end; end %>
+    <% @areas.each do |area|; next unless area.data[:texture] %>
+      <image id="area_<%= area.data[:id].to_s %>-image">
+        <init_from><%= area.data[:texture] %></init_from>
+      </image>
+    <% end %>
   </library_images>
 
   <library_geometries id="surrounding-geometry">
@@ -380,7 +399,7 @@
               </bind_material>
             </instance_geometry>
           </node>
-          <% if @conf[:ceiling] && area_mesh.data[:type] == 'generated_area' %>
+          <% if @conf[:ceiling] && area_mesh.data[:type] == :generated_area %>
             <node id="Area_<%= id %>-cap" name="Area_<%= id %>-cap">
               <translate>0.0 0.0 <%= @areas.ceiling_z %></translate>
               <instance_geometry url="#area_<%= id %>-geom">

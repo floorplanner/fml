@@ -1,8 +1,6 @@
 module Floorplanner
 
   class Document
-    POINTS_QUERY = "/project/floors/floor/designs/design/area/line/points"
-    LINE_POINTS_REGEXP = /^((\s*[-+]?[0-9]*\.?[0-9]+\s+){5,8}\s*[-+]?[0-9]*\.?[0-9]+\s*?(?:,)?)*$/
 
     def initialize(fml_fn)
       @xml = LibXML::XML::Document.file(fml_fn)
@@ -80,5 +78,4 @@ module Floorplanner
       @xml.to_s
     end
   end
-
 end

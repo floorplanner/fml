@@ -29,17 +29,22 @@ module Floorplanner
         end
       end
 
-      min_height = 10
+      heights = Hash.new
       @walls = WallBuilder.new do |b|
-        @doc.lines.each do |line|
+        @doc.lines.select{|l| l.type == :default_wall}.each do |line|
           sp = b.vertex(line.vertices[0])
           ep = b.vertex(line.vertices[1])
           b.wall(sp, ep, line.thickness, line.height)
 
-          min_height = line.height if line.height < min_height
+          if heights.include?(line.height)
+            heights[line.height] += 1
+          else
+            heights[line.height] = 1
+          end
         end
       end
-      @areas.update min_height
+      # get the most used (common) height accross linears
+      @areas.update(heights.sort{|a,b| a[1]<=>b[1]}.last[0]-0.02)
 
       @walls.prepare
       @doc.openings.each do |opening|
@@ -52,8 +57,8 @@ module Floorplanner
 
     private
 
-      def which_opening(type, asset)
-        case 
+      def which_opening(opening, asset)
+        case opening.type
         when :door
           type = Opening3D::TYPE_DOOR
         when :window

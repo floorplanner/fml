@@ -26,7 +26,7 @@ module Floorplanner
       end
     end
 
-    def wall(sp,ep,thickness,height)
+    def wall(sp, ep, thickness, height)
       @connections[sp] = Array.new unless @connections.include?(sp)
       @connections[ep] = Array.new unless @connections.include?(ep)
       cs = Geom::Connection.new(ep, 0.0)
@@ -37,7 +37,7 @@ module Floorplanner
     end
 
     # call after adding walls
-    def opening(position,size,type)
+    def opening(position, size, type)
       @walls.each do |wall|
         if wall.outline.point_inside(position)
           wall.opening(position,size,type)
