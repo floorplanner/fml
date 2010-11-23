@@ -83,15 +83,15 @@ module Collada
         when "translate"
           f = child.get_floats
           t = Geom::Matrix3D.translation(f[0],f[1],f[2])
-          result = result.multiply(t)
+          result *= t
         when "scale"
           f = child.get_floats
           t = Geom::Matrix3D.scale(f[0],f[1],f[2])
-          result = result.multiply(t)
+          result *= t
         when "rotate"
           f = child.get_floats
           t = Geom::Matrix3D.rotation(f[0],f[1],f[2],f[3])
-          result = result.multiply(t)
+          result *= t
         when "matrix"
           f = child.get_floats
           t = Geom::Matrix3D[
@@ -100,7 +100,7 @@ module Collada
             [ *f[8..11]  ],
             [ *f[12..15] ]
           ]
-          result = result.multiply(t)
+          result *= t
         end
       end
       result
