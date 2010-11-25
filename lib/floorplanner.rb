@@ -17,8 +17,18 @@ module Floorplanner
     @@config ||= YAML.load_file(File.join(File.dirname(__FILE__),'config.yml'))
   end
 
-  def self.config=(yaml)
+  def self.config= yaml
     @@config = yaml
+  end
+
+  HEX_RE = "(?i:[a-f\\d])"
+
+  def self.read_color hexstring
+    if hexstring =~ /\A#((?:#{HEX_RE}{2,2}){3,4})\z/
+       return [*$1.scan(/.{2,2}/).collect {|value| value.hex / 255.0}]
+    else
+       return [1,1,1]
+    end
   end
 end
 

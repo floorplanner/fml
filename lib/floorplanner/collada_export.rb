@@ -1,15 +1,19 @@
 module Floorplanner::XML
   class Document
 
-    def to_dae(out_path,conf={})
+    def to_dae thing, conf={}
       @design = Floorplanner::Design.new(self)
       @design.build_geometries
-      unless conf[:xrefs]
-        @design.save_textures(File.dirname(out_path))
+      if thing.kind_of? String
+        unless conf[:xrefs]
+          @design.save_textures(File.dirname(thing))
+        end
+        dae = File.new(thing,'w')
+        dae.write @design.to_dae(conf)
+        dae.close
+      elsif thing.respond_to? :write
+        thing.write @design.to_dae(conf)
       end
-      dae = File.new(out_path,'w')
-      dae.write(@design.to_dae(conf))
-      dae.close
     end
   end
 end
@@ -19,7 +23,7 @@ module Floorplanner
 
     CACHE_PATH = File.join(Floorplanner.config['dae_cache_path'], 'textures_2d')
 
-    def to_dae(conf)
+    def to_dae conf
       raise "No geometries to export" unless @areas && @walls
       @assets   = assets
       @elements = objects
@@ -74,13 +78,14 @@ module Floorplanner
 
           result << {
             :asset  => asset,
-            :matrix => m_combined
+            :matrix => m_combined,
+            :color  => Floorplanner.read_color(item.color)
           }
       end
       result
     end
 
-    def save_textures(root_path)
+    def save_textures root_path
       img_path = File.join(root_path, 'textures')
       FileUtils.mkdir_p img_path
       assets.each_value do |asset|

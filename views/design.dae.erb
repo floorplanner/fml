@@ -319,29 +319,6 @@
   <% end %>
   <library_visual_scenes>
   <visual_scene id="VisualSceneNode" name="<%= @doc.name %>">
-      <extra>
-        <technique sid="sunflow">
-          <image>
-            <resolution>800 600</resolution>
-            <aa>0 2</aa>
-            <filter>gaussian</filter>
-            <sampler>ipr</sampler>
-          </image>
-          <trace_depths>
-            <diffuse>2</diffuse>
-            <reflection>2</reflection>
-            <refraction>2</refraction>
-          </trace_depths>
-          <gi>
-            <type>ambocc</type>
-            <bright>1 1 1</bright>
-            <dark>0 0 0</dark>
-            <samples>64</samples>
-            <maxdist>3.0 </maxdist>
-          </gi>
-          <background><color>1.0 1.0 1.0</color></background>
-        </technique>
-      </extra>
       <node id="Walls" name="Walls">
         <instance_geometry url="#walls-geom">
           <bind_material>

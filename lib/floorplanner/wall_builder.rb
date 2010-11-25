@@ -52,9 +52,9 @@ module Floorplanner
         next if connections.length.zero?
 
         connections.each do |c|
-          x = c.point.x - v.x
-          y = c.point.y - v.y
-          c.angle = Math.atan2(y,x)
+          begin
+            c.angle = Math.atan2(c.point.x - v.x, c.point.y - v.y)
+          rescue; end
         end
         connections.sort! {|a,b| a.angle <=> b.angle}
         connections.each_index do |i|

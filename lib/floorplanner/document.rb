@@ -1,13 +1,12 @@
 module Floorplanner
 
   class Document
-
     def initialize fml_fn
       @xml = Nokogiri::XML.parse(open(fml_fn))
     end
+  end
 
   class DesignDocument
-
     def initialize fml
       if fml.kind_of? String # filename
         @xml = Nokogiri::XML.parse(fml)
