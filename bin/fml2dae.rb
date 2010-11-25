@@ -9,7 +9,7 @@ end
 
 conf = {
   :ceiling      => false,
-  :window_glass => false
+  :window_glass => true
 }
 
 if ARGV[0] == "-xrefs"

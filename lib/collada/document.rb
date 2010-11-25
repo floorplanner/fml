@@ -1,34 +1,32 @@
 require 'cgi'
 
 module Collada
-  class Document < LibXML::XML::Document
-    XMLNS = "http://www.collada.org/2005/11/COLLADASchema"
-    VERSION = "1.4.1"
+  class Document < Nokogiri::XML::Document
+    COLLADA_NS = "http://www.collada.org/2005/11/COLLADASchema"
+    COLLADA_VERSION = "1.4.1"
 
-    COLLADA = 'COLLADA'
     ASSET = 'asset'
-    LIBRARY_MATERIALS = 'library_materials'
-    LIBRARY_EFFECTS = 'library_effects'
-    LIBRARY_GEOMETRIES = 'library_geometries'
+    LIBRARY_MATERIALS     = 'library_materials'
+    LIBRARY_EFFECTS       = 'library_effects'
+    LIBRARY_GEOMETRIES    = 'library_geometries'
     LIBRARY_VISUAL_SCENES = 'library_visual_scenes'
-    SCENE = 'scene'
-    VISUAL_SCENE = 'visual_scene'
+    SCENE                 = 'scene'
+    VISUAL_SCENE          = 'visual_scene'
     INSTANCE_VISUAL_SCENE = 'instance_visual_scene'
 
     attr_accessor :assets_libraries
 
     def initialize
       super
-      self.root = LibXML::XML::Node.new(COLLADA)
-      self.root.namespaces.namespace = LibXML::XML::Namespace.new(self.root,nil,XMLNS)
-      self.root.attributes['version'] = VERSION
+      root = create_element 'COLLADA'
+      root.namespace = COLLADA_NS
+      root.attr['version'] = COLLADA_VERSION
 
       create_structure
-
-      self.assets_libraries = []
+      assets_libraries = []
     end
 
-    def << (node)
+    def << node
       root << node
     end
 
@@ -51,18 +49,18 @@ module Collada
 
     private
       def create_structure
-        self << LibXML::XML::Node.new(ASSET)
+        self << create_element(ASSET)
 
-        self << LibXML::XML::Node.new(LIBRARY_MATERIALS)
-        self << LibXML::XML::Node.new(LIBRARY_EFFECTS)
-        self << LibXML::XML::Node.new(LIBRARY_GEOMETRIES)
-        self << (visual_scenes = LibXML::XML::Node.new(LIBRARY_VISUAL_SCENES))
-        visual_scenes << (visual_scene = LibXML::XML::Node.new(VISUAL_SCENE))
+        self << create_element(LIBRARY_MATERIALS)
+        self << create_element(LIBRARY_EFFECTS)
+        self << create_element(LIBRARY_GEOMETRIES)
+        self << (visual_scenes = create_element(LIBRARY_VISUAL_SCENES))
+        visual_scenes << (visual_scene = create_element(VISUAL_SCENE))
         visual_scene['id'] = 'MainScene'
         visual_scene['name'] = 'MainScene'
 
-        self << (scene = LibXML::XML::Node.new(SCENE))
-        scene << (scene_node = LibXML::XML::Node.new(INSTANCE_VISUAL_SCENE))
+        self << (scene = create_element(SCENE))
+        scene << (scene_node = create_element(INSTANCE_VISUAL_SCENE))
         scene_node['url'] = '#MainScene'
       end
 

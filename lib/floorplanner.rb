@@ -7,7 +7,7 @@ require 'fileutils'
 
 require 'rubygems'
 require 'zip/zip'
-require 'libxml'
+require 'nokogiri'
 require 'roxml'
 
 $LOAD_PATH.push(File.dirname(__FILE__))
@@ -19,14 +19,6 @@ module Floorplanner
 
   def self.config=(yaml)
     @@config = yaml
-  end
-end
-
-module LibXML::XML
-  class Node
-    def get_floats
-      content.split(/\s|,/).delete_if {|s| s.empty?}.map! {|f| f.to_f}
-    end
   end
 end
 

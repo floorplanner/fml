@@ -19,10 +19,10 @@ module Floorplanner
       case @type
       when TYPE_DOOR
         @position.z = 0.01
-        height = @size.z # Floorplanner.config['openings']['door_height']
+        height = @size.z == 0 ? Floorplanner.config['openings']['door_height'] : @size.z
       else
-        @position.z = base_z # Floorplanner.config['openings']['window_base']
-        height = @size.z # Floorplanner.config['openings']['window_height']
+        @position.z = base_z == 0 ? Floorplanner.config['openings']['window_base'] : base_z
+        height = @size.z == 0 ? Floorplanner.config['openings']['window_height'] : @size.z
       end
 
       v1 = Geom::Vertex.new(-width/2,0,0)

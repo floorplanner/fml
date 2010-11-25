@@ -44,8 +44,10 @@ module Floorplanner
       @kmz   = kmz
       @id    = id
       @title = title
-      @xml   = LibXML::XML::Document.string(File.read(@dae_path).gsub(/xmlns=".+"/, ''))
       @name  = File.basename(@dae_path.gsub(/\.|dae/,''))
+      
+      @doc   = Nokogiri::XML.parse(open(@dae_path))
+      @doc.remove_namespaces!
       @images_dict = {}
     end
 
@@ -54,46 +56,46 @@ module Floorplanner
 
     def library_materials
       return @materials if @materials
-      materials = @xml.find(LIBRARY_MATERIALS)
+      materials = @doc.xpath(LIBRARY_MATERIALS)
       materials.each {|mat| namespace!(mat)}
       @materials = materials
     end
 
     def library_effects
       return @effects if @effects
-      effects = @xml.find(LIBRARY_EFFECTS)
+      effects = @doc.xpath(LIBRARY_EFFECTS)
       effects.each {|eff| namespace!(eff)}
       @effects = effects
     end
 
     def library_geometries
       return @geometries if @geometries
-      geometries = @xml.find(LIBRARY_GEOMETRIES)
+      geometries = @doc.xpath(LIBRARY_GEOMETRIES)
       geometries.each{|geo| namespace!(geo)}
       @geometries = geometries
     end
 
     def library_nodes
       return @nodes if @nodes
-      nodes = @xml.find(LIBRARY_NODES)
+      nodes = @doc.xpath(LIBRARY_NODES)
       nodes.each{|nod| namespace!(nod)}
       @nodes = nodes
     end
 
     def library_images
       return @images if @images
-      images = @xml.find(LIBRARY_IMAGES)
+      images = @doc.xpath(LIBRARY_IMAGES)
       images.each{|img| namespace!(img) && update_path!(img)}
       @images = images
     end
 
     def visual_scene_node
       return @scene_node if @scene_node
-      @scene_node = namespace!(@xml.find(VISUAL_SCENE_QUERY).first)
+      @scene_node = namespace!(@doc.xpath(VISUAL_SCENE_QUERY).first)
     end
 
     def bounding_box
-      mesh = Collada::Geometry.doc @xml
+      mesh = Collada::Geometry.doc @doc
       mesh.bounding_box
     end
 
@@ -118,11 +120,11 @@ module Floorplanner
     end
 
     def save_textures(root_path)
-      images = @xml.find(LIBRARY_IMAGES)
-      FileUtils.mkdir_p(root_path) unless images.length.zero?
+      images = @doc.xpath(LIBRARY_IMAGES)
+      FileUtils.mkdir_p(root_path)
 
       images.each do |image|
-        relative_to_dae = image.find('init_from').first.content
+        relative_to_dae = image.xpath('init_from').first.content
         img_path = @kmz.image_path(@id,relative_to_dae)
         target_path = File.join(root_path,@id)
         FileUtils.mkdir_p target_path
@@ -135,15 +137,15 @@ module Floorplanner
     end
 
     def adjust_paths!
-      images = @xml.find(LIBRARY_IMAGES)
+      images = @doc.xpath(LIBRARY_IMAGES)
 
       images.each do |image|
-        init_from = image.find('init_from').first
+        init_from = image.xpath('init_from').first
         img_path = @kmz.image_path(@id,init_from.content,true)
         init_from.content = img_path
       end
       open(@dae_path, 'w') do |f|
-        f.write @xml.to_s
+        f.write @doc.to_s
       end
     end
 
@@ -163,12 +165,12 @@ module Floorplanner
       node['texture'] = "#{@name}_#{node['texture'].gsub('#','')}" if node['texture']
 
       if node.name == 'surface'
-        n = node.find('init_from').first
+        n = node.xpath('init_from').first
         n.content = "#{@name}_#{n.content}"
       end
 
       if node.name == 'sampler2D'
-        n = node.find('source').first
+        n = node.xpath('source').first
         n.content = "#{@name}_#{n.content}"
       end
 
@@ -180,7 +182,7 @@ module Floorplanner
 
     # updates image path to export output folder
     def update_path!(node)
-      init_from_node = node.find('init_from').first
+      init_from_node = node.xpath('init_from').first
       relative = init_from_node.content
       init_from_node.content = @images_dict[relative]
     end

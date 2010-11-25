@@ -52,7 +52,6 @@ module Floorplanner
     def objects
       result = []
       @doc.objects.each do |item|
-        begin
           next unless assets[item.asset]
           asset = assets[item.asset]
 
@@ -77,9 +76,6 @@ module Floorplanner
             :asset  => asset,
             :matrix => m_combined
           }
-        rescue
-          $stderr.puts "Error of object asset##{asset.id} - #{$!}"
-        end
       end
       result
     end

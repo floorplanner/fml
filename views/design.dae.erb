@@ -10,18 +10,6 @@
     <up_axis>Z_UP</up_axis>
   </asset>
   
-  <library_cameras>
-    <camera id="main-cam">
-      <optics>
-        <technique_common>
-          <perspective>
-            <yfov>70</yfov>
-          </perspective>
-        </technique_common>
-      </optics>
-    </camera>
-  </library_cameras>
-
   <library_materials id="surrounding-materials">
     <material id="walls-material" name="WallsMaterial">
       <instance_effect url="#walls-fx"/>
@@ -340,8 +328,9 @@
             <sampler>ipr</sampler>
           </image>
           <trace_depths>
-            <diffuse>4</diffuse>
+            <diffuse>2</diffuse>
             <reflection>2</reflection>
+            <refraction>2</refraction>
           </trace_depths>
           <gi>
             <type>ambocc</type>
@@ -350,22 +339,9 @@
             <samples>64</samples>
             <maxdist>3.0 </maxdist>
           </gi>
-          <sunsky>
-            <up>0 0 1</up>
-            <east>1 0 0</east>
-            <sundir>0.2 0.4 0.7</sundir>
-            <ground>1 1 1</ground>
-          </sunsky>
+          <background><color>1.0 1.0 1.0</color></background>
         </technique>
       </extra>
-      <node id="Camera" name="Camera">
-        <lookat>
-          9.0 -1.0 1.4
-          8.0 -2.0 1.4
-          0.0 0.0 1.0
-        </lookat>
-        <instance_camera url="#main-cam"/>
-      </node>
       <node id="Walls" name="Walls">
         <instance_geometry url="#walls-geom">
           <bind_material>

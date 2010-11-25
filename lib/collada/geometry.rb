@@ -6,14 +6,14 @@ module Collada
     GEOMETRY_QUERY     = '/COLLADA/library_geometries/geometry[@id="%s"]'
     NODE_QUERY         = '/COLLADA/library_nodes//node[@id="%s"]'
 
-    def self.doc(xml)
+    def self.doc doc
       result = Geometry.new
       result.instance_eval do
-        @xml   = xml
+        @doc   = doc
         @cache = {}
 
-        scene_id = xml.find(SCENE_QUERY).first.attributes['url'][1..-1]
-        scene = xml.find(VISUAL_SCENE_QUERY % scene_id).first
+        scene_id = @doc.xpath(SCENE_QUERY).first.attribute('url').value[1..-1]
+        scene = @doc.xpath(VISUAL_SCENE_QUERY % scene_id).first
         scene.children.each do |child|
           eval_node(child) if child.name == "node"
         end
@@ -23,7 +23,7 @@ module Collada
 
     private
 
-    def eval_node(node,parent=nil)
+    def eval_node node, parent=nil
       parent = node.parent unless parent
       parent_matrix = Geom::Matrix3D.identity
       if parent.name == "node"
@@ -43,23 +43,22 @@ module Collada
         when "node"
           eval_node(child,node)
         when "instance_geometry"
-          load_geometry(child.attributes['url'][1..-1],node_matrix)
+          load_geometry(child.attribute('url').value[1..-1],node_matrix)
         when "instance_node"
           eval_node(expand_node(child),node)
         end
       end
     end
 
-    def load_geometry(gid,matrix=nil)
-      geometry = @xml.find(GEOMETRY_QUERY % gid).first
+    def load_geometry gid, matrix=nil
+      geometry = @doc.xpath(GEOMETRY_QUERY % gid).first
       mesh = Geom::TriangleMesh.new
 
       floats = Array.new
-      geometry.find('mesh/triangles').each do |triangles|
-        vertices_id = triangles.find('input[@semantic="VERTEX"]').first.attributes['source'][1..-1]
-        source_id   = geometry.find('mesh/vertices[@id="%s"]/input[@semantic="POSITION"]' % vertices_id).first.attributes['source'][1..-1]
-
-        floats.concat geometry.find('mesh/source[@id="%s"]/float_array' % source_id).first.get_floats
+      geometry.xpath('mesh/triangles').each do |triangles|
+        vertices_id = triangles.xpath('input[@semantic="VERTEX"]').first.attribute('source').value[1..-1]
+        source_id   = geometry.xpath('mesh/vertices[@id="%s"]/input[@semantic="POSITION"]' % vertices_id).first.attribute('source').value[1..-1]
+        floats.concat geometry.xpath('mesh/source[@id="%s"]/float_array' % source_id).first.content.split.map(&:to_f)
       end
 
       (floats.length/3).times do |i|
@@ -71,12 +70,12 @@ module Collada
       @meshes << mesh
     end
 
-    def expand_node(instance)
-      node_id = instance.attributes['url'][1..-1]
-      @xml.find(NODE_QUERY % node_id).first
+    def expand_node instance
+      node_id = instance.attribute('url').value[1..-1]
+      @doc.xpath(NODE_QUERY % node_id).first
     end
 
-    def get_node_matrix(node,source=nil)
+    def get_node_matrix node, source=nil
       result = source ? source : Geom::Matrix3D.identity
       node.children.each do |child|
         case child.name
@@ -93,7 +92,7 @@ module Collada
           t = Geom::Matrix3D.rotation(f[0],f[1],f[2],f[3])
           result *= t
         when "matrix"
-          f = child.get_floats
+          f = child.content.split.map(&:to_f)
           t = Geom::Matrix3D[
             [ *f[0..3]   ],
             [ *f[4..7]   ],

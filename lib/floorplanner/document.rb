@@ -2,45 +2,33 @@ module Floorplanner
 
   class Document
 
-    def initialize(fml_fn)
-      @xml = LibXML::XML::Document.file(fml_fn)
+    def initialize fml_fn
+      @xml = Nokogiri::XML.parse(open(fml_fn))
     end
-
-    def self.validate(doc)
-      schema = LibXML::XML::RelaxNG.document(
-        LibXML::XML::Document.file(File.join(File.dirname(__FILE__), "..", "..", "xml", "fml.rng"))
-      )
-      doc = LibXML::XML::Document.file(doc) if doc.instance_of?(String)
-      doc.validate_relaxng(schema) do |message,error|
-        # TODO throw an exception
-        puts message if error
-      end
-    end
-  end
 
   class DesignDocument
 
-    def initialize(fml)
+    def initialize fml
       if fml.kind_of? String # filename
-        @xml = LibXML::XML::Document.file(fml)
-      elsif fml.kind_of? LibXML::XML::Document
+        @xml = Nokogiri::XML.parse(fml)
+      elsif fml.kind_of? Nokogiri::XML::Document
         @xml = fml
       elsif fml.respond_to?(:read) # IO
-        @xml = LibXML::XML::Document.io(fml)
+        @xml = Nokogiri::XML.parse(fml)
       else
         raise ArgumentError.new("values must be one of: filename, IO, LibXML::XML::Document")
       end
     end
 
-    def update_heights(new_height)
-      lines = @xml.find("/design/lines/line[type='default_wall' or type='normal_wall' or contains(type,'hedge') or contains(type,'fence')]")
+    def update_heights new_height
+      lines = @xml.xpath("/design/lines/line[type='default_wall' or type='normal_wall' or contains(type,'hedge') or contains(type,'fence')]")
       lines.each do |line|
         begin
-          points = line.find("points").first
+          points = line.xpath("points").first
           next unless points.content.include? ","
 
           coords = points.content.strip.split(",")
-          top_coords = coords[1].strip.split(/\s/).map{|c| c.to_f}
+          top_coords = coords[1].strip.split(/\s/).map(&:to_f)
 
           top_coords[2] = new_height
           top_coords[5] = new_height
@@ -54,11 +42,11 @@ module Floorplanner
       end
     end
 
-    def update_thumb_2d_url(thumb_2d_url)
-      if thumb_node = @xml.find_first('/design/thumb-2d-url')
+    def update_thumb_2d_url thumb_2d_url
+      if thumb_node = @xml.xpath('/design/thumb-2d-url').first
         thumb_node.content = thumb_2d_url
-      elsif design_node = @xml.find_first('/design')
-        thumb_node = LibXML::XML::Node.new('thumb-2d-url')
+      elsif design_node = @xml.xpath('/design').first
+        thumb_node = @xml.create_element('thumb-2d-url')
         thumb_node.content = thumb_2d_url
         design_node << thumb_node
       else
@@ -66,8 +54,8 @@ module Floorplanner
       end
     end
 
-    def save(path)
-      @xml.save path
+    def save path
+      @xml.write_to open(path, 'w')
     end
 
     def to_xml
