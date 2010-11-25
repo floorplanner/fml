@@ -3,7 +3,7 @@
 Gem::Specification.new do |s|
   s.name    = "fml"
   s.version = "0.2.4"
-  s.date    = "2010-05-18"
+  s.date    = "2010-11-25"
   
   s.required_rubygems_version = Gem::Requirement.new(">= 1.3.0") if s.respond_to? :required_rubygems_version=
   
